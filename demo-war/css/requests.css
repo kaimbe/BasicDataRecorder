@@ -1,0 +1,14 @@
+h2 {
+    font-size: 1.4em;
+}
+
+dt {
+    font-family: monospace;
+    font-weight: bold;
+    border-top : thin solid blue;
+}
+
+dd {
+    font-family: monospace;
+    background : rgb(255,240,240);
+}

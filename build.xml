@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+<project name="webapp" default="help" basedir=".">
+
+    <target name="help">
+        <echo message="ant help -- print this message"/>
+        <echo message="ant jetty -- runs the web application using jetty"/>
+        <echo message="ant mkwar -- creates a web archieve"/>
+        <echo message="ant compile -- compiles the source"/>
+        <echo message="ant clean -- removes war directory"/>
+        <echo message="ant clean-log -- removes logs"/>
+        <echo message="use -Dapp.name=yourapp for yourapp"/>
+    </target>
+
+    <property name="jetty.dir" value="./jetty" />
+    <property name="app.name" value="demo" />
+    <property name="app.wardir" value="${app.name}-war" />
+    <property name="server.port" value="8000" />
+
+    <path id="jetty-jars">
+        <pathelement location="${jetty.dir}/servlet-api-3.0.jar" />
+        <pathelement location="${jetty.dir}/jetty-all.jar" />
+    </path>
+
+    <path id="lib-jars">
+        <pathelement location="lib/sqlite-jdbc-3.7.2.jar" />
+        <pathelement location="lib/gson-2.2.2.jar" />
+    </path>
+
+    <path id="app-jars">
+        <path refid="lib-jars"/>
+        <path refid="jetty-jars"/>
+    </path>
+
+    <!-- Create the standard WAR directory structure -->
+    <target name="war-dir">
+        <mkdir dir="${app.wardir}"/>
+        <mkdir dir="${app.wardir}/WEB-INF"/>
+        <mkdir dir="${app.wardir}/WEB-INF/classes"/>
+        <mkdir dir="${app.wardir}/WEB-INF/lib"/>
+        <copy file="${app.name}/web.xml" todir="${app.wardir}/WEB-INF"/>
+        <copy todir="${app.wardir}">
+            <fileset dir="${app.name}/html"/>
+        </copy>
+    </target>
+
+    <target name="server" depends="">
+        <javac
+            includeantruntime="false"
+            srcdir="server" destdir="server">
+            <include name="SingleWebApp.java"/>
+            <classpath path="server">
+                <path refid="jetty-jars"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="jetty" depends="server,compile">
+        <java classname="SingleWebApp" fork="true">
+            <classpath path="server">
+                <path refid="app-jars"/>
+            </classpath>
+            <arg value="-j"/>
+            <arg value="bp/db_config"/>
+            <arg value="${app.wardir}"/>
+            <arg value="/${app.name}"/>
+        </java>
+    </target>
+
+    <target name="compile" depends="war-dir">
+        <javac
+            includeantruntime="false"
+            srcdir="${app.name}/src" destdir="${app.wardir}/WEB-INF/classes">
+
+            <include name="*/*.java"/>
+            <classpath>
+                <path refid="app-jars"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="clean">
+        <!-- remove the directory tree -->
+        <delete dir="${app.wardir}" />
+        <delete file="server/SingleWebApp.class" />
+        <delete file="${app.name}.war" />
+    </target>
+
+    <target name="clean-log">
+        <delete>
+            <fileset dir="./logs">
+                <include name="*.log"/>
+            </fileset>
+        </delete>
+    </target>
+
+    <!-- Creates a WAR file, this is only necessary when installing
+          your application into an external server,                
+    -->
+    <target name="mkwar" depends="compile">
+        <jar jarfile="${app.name}.war" basedir="${app.wardir}" />
+    </target>
+
+</project>

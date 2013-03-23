@@ -1,0 +1,2 @@
+#!/bin/bash
+java -cp jetty/jetty-all.jar org.eclipse.jetty.util.security.Password $*

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+<record>
+  <date>2013-03-09T10:18:23</date>
+  <millis>1362836903590</millis>
+  <sequence>0</sequence>
+  <logger>org.eclipse.jetty.server.Server</logger>
+  <level>INFO</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>info</method>
+  <thread>1</thread>
+  <message>jetty-8.1.9.v20130131</message>
+</record>
+<record>
+  <date>2013-03-09T10:18:23</date>
+  <millis>1362836903817</millis>
+  <sequence>1</sequence>
+  <logger>org.eclipse.jetty.webapp.StandardDescriptorProcessor</logger>
+  <level>INFO</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>info</method>
+  <thread>1</thread>
+  <message>NO JSP Support for /bp-snap, did not find org.apache.jasper.servlet.JspServlet</message>
+</record>
+<record>
+  <date>2013-03-09T10:18:23</date>
+  <millis>1362836903931</millis>
+  <sequence>2</sequence>
+  <logger>org.eclipse.jetty.server.AbstractConnector</logger>
+  <level>INFO</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>info</method>
+  <thread>1</thread>
+  <message>Started SelectChannelConnector@0.0.0.0:8000</message>
+</record>
+<record>
+  <date>2013-03-09T10:18:30</date>
+  <millis>1362836910230</millis>
+  <sequence>3</sequence>
+  <logger>/bp-snap</logger>
+  <level>INFO</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>info</method>
+  <thread>17</thread>
+  <message>BPEdit: /bp-snap/edit</message>
+</record>
+<record>
+  <date>2013-03-09T10:18:34</date>
+  <millis>1362836914803</millis>
+  <sequence>4</sequence>
+  <logger>/bp-snap</logger>
+  <level>INFO</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>info</method>
+  <thread>16</thread>
+  <message>UserEdit: /bp-snap/users</message>
+</record>
+</log>

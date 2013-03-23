@@ -1,0 +1,19 @@
+create table users (
+    id integer primary key,
+    username text not null unique,
+    pwd text not null);
+insert into "users" VALUES(1,'rod','rod');
+insert into "users" VALUES(2,'dor','dor');
+create table roles (
+    id integer primary key,
+    role text not null unique);
+insert into "roles" VALUES(1,'user');
+insert into "roles" VALUES(2,'admin');
+create table user_roles (
+    user_id integer not null,
+    role_id integer not null,
+    primary key (user_id, role_id) );
+insert into "user_roles" VALUES(1,1);
+insert into "user_roles" VALUES(1,2);
+insert into "user_roles" VALUES(2,1);
+.dump

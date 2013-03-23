@@ -1,0 +1,57 @@
+<html>
+<head>
+</head>
+<body>
+
+<h2>Request tests</h2>
+
+<ul>
+    <li>
+        <a href="requests">request</a>
+    </li>
+    <li>
+        <a href="requests/one/two/three">request/one/two/three</a>
+    </li>
+    <li>
+        <a href="requests/one?a=1&b=2">request/one?a=1&amp;b=2</a>
+    </li>
+    <li>
+        <form method="get" action="requests">
+        <label for="firstname">First name: </label>
+        <input type="text" size="6" name="firstname" value="abc">
+        <label for="lastname">Last name: </label>
+        <input type="text" size="12" name="lastname" value="def">
+        <input type="submit" value="Send">
+        </form>
+    </li>
+    <li>
+        <form method="post" action="requests">
+        <label for="firstname">First name: </label>
+        <input type="text" size="6" name="firstname" value="first">
+        <label for="lastname">Last name: </label>
+        <input type="text" size="12" name="lastname" value="last">
+        <input type="submit" value="Send">
+        </form>
+    </li>
+</ul>
+
+<h2> Weather </h2>
+<p>
+    <a href="servlet/weather/list">list weather</a>
+</p>
+
+<form method="post" action="servlet/weather/update">
+    <label for="location">Location: </label>
+    <input type="text" size="20" name="location" value="St. John's">
+    <br>
+    <label for="temp">Current temperature: </label>
+    <input type="text" size="6" name="temp" value="15.0">
+    <br>
+    <label for="synopsis">Synopsis: </label>
+    <input type="text" size="30" name="synopsis" value="--">
+    <br>
+    <input type="submit" value="Send">
+</form>
+
+</body>
+</html>

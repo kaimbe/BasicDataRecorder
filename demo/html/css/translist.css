@@ -1,0 +1,6 @@
+button.delete {
+    margin-left : 2em;
+    margin-top : 5px;
+    border : thin red solid;
+    background : inherit;
+}
