@@ -1,0 +1,33 @@
+body {
+    background: rgb(255,255,240);
+    width : 90%;
+    margin-left : auto;
+    margin-right : auto;
+}
+
+table.editor {
+    border : thin solid black;
+    border-collapse : collapse;
+}
+table.editor td {
+    border : thin solid black;
+    padding : 4px;
+}
+
+div#user-list h2 {
+    color : blue;
+}
+
+div#user-list table tr td:first-child {
+    width : 8em;
+}
+div#user-list table tr td:first-child + td {
+    width : 8em;
+}
+div#user-list table tr td:first-child + td + td {
+    width : 10em;
+}
+
+div#user-list table tr:first-child td {
+    border-bottom : solid blue thin;
+}

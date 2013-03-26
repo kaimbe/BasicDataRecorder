@@ -1,0 +1,17 @@
+jdbcdriver = org.sqlite.JDBC
+url = jdbc:sqlite:bp/ua.db
+# username and password not used by sqlite but JDBCLoginService wants them
+username = jetty
+password = jetty
+usertable = users
+usertablekey = id
+usertableuserfield = username
+usertablepasswordfield = pwd
+roletable = roles
+roletablekey = id
+roletablerolefield = role
+userroletable = user_roles
+userroletableuserkey = user_id
+userroletablerolekey = role_id
+# a delete user will not disappear until the cache is flushed
+cachetime = 300
