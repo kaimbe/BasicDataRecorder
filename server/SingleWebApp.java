@@ -104,7 +104,7 @@ public class SingleWebApp {
         
 
         server.setHandler(webapp);
-        server.setGracefulShutdown(2000);
+        server.setGracefulShutdown(0);
         server.start();
         server.join();
     }

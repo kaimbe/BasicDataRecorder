@@ -12,7 +12,7 @@
     </target>
 
     <property name="jetty.dir" value="./jetty" />
-    <property name="app.name" value="demo" />
+    <property name="app.name" value="proj" />
     <property name="app.wardir" value="${app.name}-war" />
     <property name="server.port" value="8000" />
 
