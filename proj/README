@@ -1,8 +1,0 @@
-The contents are:
-
-    bp.db -- will be created when jetty is run
-
-    html -- directory contain html, javascript, css, and other static content
-    passwords -- file contain user, their password, and their role
-    src -- source code for system
-    web.xml -- web application file
