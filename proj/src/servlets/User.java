@@ -32,7 +32,9 @@ public class User extends HttpServlet{
         html.printHtmlStart(out);
         out.println("<body>");
         
-        // body goes here
+        out.println("div class='nav");
+        html.printUserNav(out);
+        out.println("</div>");
         
         out.println("</body>");
         html.printHtmlEnd(out);
