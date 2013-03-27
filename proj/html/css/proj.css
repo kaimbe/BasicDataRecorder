@@ -31,3 +31,19 @@ div#user-list table tr td:first-child + td + td {
 div#user-list table tr:first-child td {
     border-bottom : solid blue thin;
 }
+
+div#navbar {
+    border-bottom: solid black thin;
+}
+
+div#usernav {
+    border-bottom: solid black thin;
+}
+
+div#adminbar{
+    border-bottom: solid black thin;
+}
+
+div#adminnav{
+	
+}
