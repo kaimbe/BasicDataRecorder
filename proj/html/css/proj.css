@@ -50,7 +50,18 @@ div#adminnav{
 }
 
 div.nav{
-	float:left;
+	position:absolute;
+	right:1320px;
 	width:13%;
 	border: solid black thin;
+}
+
+div.usersplash{
+	position:absolute;
+	right:670px;
+}
+
+div.adminsplash{
+	position:absolute;
+	right:670px;
 }

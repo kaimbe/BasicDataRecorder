@@ -35,7 +35,13 @@ public class User extends HttpServlet{
         out.println("<div class='nav'>");
         html.printUserNav(out);
         out.println("</div>");
-        
+        out.println("<div class='usersplash'>");
+        out.println("<h1> Welcome " + request.getRemoteUser() + "!</h1>");
+        out.println("<h1>Published Projects:</h1>");
+        out.println("<ul>");
+        out.println("<li>No projects yet");
+        out.println("</ul>");
+        out.println("</div>");
         out.println("</body>");
         html.printHtmlEnd(out);
     }

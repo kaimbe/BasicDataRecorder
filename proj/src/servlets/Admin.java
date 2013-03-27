@@ -33,9 +33,16 @@ public class Admin extends HttpServlet{
         out.println("<body>");
         
         out.println("<div class='nav'>");
-        html.printAdminNav(out);
+        html.printUserNav(out);
         out.println("</div>");
-        
+        out.println("<div class='adminsplash'>");
+        out.println("<h1> Welcome " + request.getRemoteUser() + "!</h1>");
+        out.println("<h1> You have admin privileges!");
+        out.println("<h1>Published Projects:</h1>");
+        out.println("<ul>");
+        out.println("<li>No projects yet");
+        out.println("</ul>");
+        out.println("</div>");
         out.println("</body>");
         html.printHtmlEnd(out);
     }
