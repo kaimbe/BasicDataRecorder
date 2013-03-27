@@ -1,6 +1,8 @@
 package servlets;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -24,6 +26,25 @@ public class Login extends HttpServlet{
         util.HTTPUtils.nocache( response );
         String context = request.getContextPath();
         
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+        html.printHtmlStart(out);
+        out.println("<body>");
+        out.println("<h1>Login</h1>");
+        out.println("<div id='login'>");
+        out.println("<p>Please Enter Your Credentials:</p><br>");
+        out.print("<label>");
+        out.print("User Name: <input id='un' type='text' size='10'>");
+        out.println("</label><br>");
+        out.print("<label>");
+        out.print("Password: <input id='pw' type='text' size='10'>");
+        out.println("</label><br>");
+        out.println("<button id='loginBut'>Login</button><br>");
+        out.println("<button id='newAccBut'>Create New Account</button><br>");
+        out.println("</div>");
+        
+        out.println("</body>");
+        html.printHtmlEnd(out);
     }
 	
 	@Override
