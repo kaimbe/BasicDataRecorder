@@ -37,13 +37,20 @@ div#navbar {
 }
 
 div#usernav {
-    border-bottom: solid black thin;
+	
 }
 
 div#adminbar{
     border-bottom: solid black thin;
+    border-top: solid black thin;
 }
 
 div#adminnav{
 	
+}
+
+div.nav{
+	float:left;
+	width:13%;
+	border: solid black thin;
 }
