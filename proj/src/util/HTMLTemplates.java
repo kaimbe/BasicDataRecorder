@@ -71,6 +71,34 @@ public class HTMLTemplates {
     public void printHtmlEnd( PrintWriter pw ) {
         pw.print( htmlEndStr );
     }
+    
+    public void printUserNav( PrintWriter pw ) {
+    	pw.println("<div id='navbar'>");
+    	pw.println("<h1>User Navigation</h1>");
+    	pw.println("</div>");
+    	pw.println("<div id='usernav'>");
+    	pw.println("<ul class='navlist'>");
+    	pw.println("<li><a href='My_Projects'>My Projects</a></li>");
+    	pw.println("<li><a href='Power_Search'>Power Search</a></li>");
+    	pw.println("<li><a href='My_Account'>My Account</a></li>");
+    	pw.println("<li><a href='Logout'>Logout</a></li>");
+    	pw.println("</ul>");
+    	pw.println("</div>");
+    }
+    
+    public void printAdminNav( PrintWriter pw ) {
+    	printUserNav(pw);
+    	pw.println("<div id='adminbar'>");
+    	pw.println("<h1>Admin Navigation</h1>");
+    	pw.println("</div>");
+    	pw.println("<div id='adminnav'>");
+    	pw.println("<ul class='adminlist'>");
+    	pw.println("<li><a href='Manage_Projects'>Manage Projects</a></li>");
+    	pw.println("<li><a href='Manage_Users'>Manage Users</a></li>");
+    	pw.println("</ul>");
+    	pw.println("</div>");
+    	
+    }
 
     public String escape( String str ) {
         StringBuilder sb = new StringBuilder();
