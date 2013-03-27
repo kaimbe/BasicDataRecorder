@@ -76,7 +76,6 @@
         <url-pattern>/report/*</url-pattern>
     </servlet-mapping>
 
-
     <servlet>
         <description>User Account Admin</description>
         <display-name>UserEdit</display-name>
@@ -100,6 +99,7 @@
         <servlet-name>UserEdit</servlet-name>
         <url-pattern>/edit_users/*</url-pattern>
     </servlet-mapping>
+    
     <servlet>
     	<description>Login Page</description>
     	<display-name>Login</display-name>
@@ -118,10 +118,12 @@
     		<param-value>Login</param-value>
     	</init-param>
     </servlet>
+    
     <servlet-mapping>
     	<servlet-name>Login</servlet-name>
     	<url-pattern>/login/*</url-pattern>
     </servlet-mapping>
+    
     <servlet>
     	<description>User Page</description>
     	<display-name>User</display-name>
@@ -133,7 +135,7 @@
     	</init-param>
     	<init-param>
     		<param-name>js</param-name>
-    		<param-value>local_ajax.js,proj.js</param-value>
+    		<param-value>local_ajax.js,login.js</param-value>
     	</init-param>
     	<init-param>
     		<param-name>title</param-name>
@@ -144,6 +146,7 @@
     	<servlet-name>User</servlet-name>
     	<url-pattern>/user/*</url-pattern>
     </servlet-mapping>
+    
     <servlet>
     	<description>Admin Page</description>
     	<display-name>Admin</display-name>

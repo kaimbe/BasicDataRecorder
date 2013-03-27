@@ -34,10 +34,10 @@ public class Login extends HttpServlet{
         out.println("<div id='login'>");
         out.println("<p>Please Enter Your Credentials:</p><br>");
         out.print("<label>");
-        out.print("User Name: <input id='un' type='text' size='10'>");
+        out.print("Username: <input id='un' type='text' size='15'>");
         out.println("</label><br>");
         out.print("<label>");
-        out.print("Password: <input id='pw' type='text' size='10'>");
+        out.print("Password: <input id='pw' type='password' size='15'>");
         out.println("</label><br>");
         out.println("<button id='loginBut'>Login</button><br>");
         out.println("<button id='newAccBut'>Create New Account</button><br>");
@@ -50,6 +50,13 @@ public class Login extends HttpServlet{
 	@Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
+		log( request.getRequestURI() );
+        util.HTTPUtils.nocache( response );
+        PrintWriter out = response.getWriter();
+        String user = request.getRemoteUser();
+        String context = request.getContextPath();
+        
+		HttpSession session = request.getSession(true);
 		
     }
 	
