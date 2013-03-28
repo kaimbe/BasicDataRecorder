@@ -4,8 +4,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
@@ -31,6 +35,27 @@ public class Login extends HttpServlet{
         log( request.getRequestURI() );
         util.HTTPUtils.nocache( response );
         String context = request.getContextPath();
+        String reqSesID = request.getRequestedSessionId();
+        String username = request.getRemoteUser();
+        System.out.println("REQ SESSION ID: " + reqSesID);
+        System.out.println("REMOTE USER: " + username);
+       
+        try {
+        	List<String> sessions = userAuth.getUserSessions(username);
+        	System.out.println("SESSIONS: ");
+            for (String s : sessions) {
+            	
+            	System.out.println(s);
+            	if (reqSesID.equals(s)) {
+            		// ALREADY LOGGED IN
+            		// TAKE USER TO SPLASH
+            		
+            	}
+            }
+        }
+        catch (SQLException e) {
+        	log( e.getMessage() );
+	    }
         
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
@@ -70,21 +95,16 @@ public class Login extends HttpServlet{
         util.HTTPUtils.nocache( response );
         PrintWriter out = response.getWriter();
         String username = request.getRemoteUser();
-        String sessionID = request.getRequestedSessionId();
-        
+        String reqSesID = request.getRequestedSessionId();
         String context = request.getContextPath();
+        
+        
+        
 		
-        Cookie[] co = request.getCookies();
-        
-        for (int i = 0; i < co.length; i++) {
-        	System.out.println("COOKIE NAME: " + co[i].getName());
-        	System.out.println("COOKIE VALUE: " + co[i].getValue());
+        if ( userAuth == null ) {
+            response.sendRedirect( context + Constants.DB_ERR_PAGE );
+            return;
         }
-        
-        System.out.println("REMOTE USER: " + username);
-        System.out.println("REQ SESSION ID: " + sessionID);
-        
-        
         
 		BufferedReader rd = request.getReader();
         String json = readAll( rd );
@@ -94,6 +114,7 @@ public class Login extends HttpServlet{
         // Debugging
         System.out.println("JSON: " + json);
         System.out.println("REMOTE USER: " + username);
+        System.out.println("REQ SESSION ID: " + reqSesID);
         System.out.println();
         System.out.println("USERNAME: " + user.getUsername());
         System.out.println("PASSWORD: " + user.getPassword());
@@ -101,9 +122,12 @@ public class Login extends HttpServlet{
         boolean pwdOk = false;
         try {
 			long userID = userAuth.getUserId(user.getUsername());
-			System.out.println(userID);
+			System.out.println("USER ID: " + userID);
 			if(userID == -1) {
 				// INVALID CREDS
+				// USERNAME
+				response.sendRedirect( context + Constants.INVALID_USER );
+				return;
 			}
 			else {
 				pwdOk = userAuth.checkPassword(user.getUsername(), user.getPassword());
@@ -113,18 +137,38 @@ public class Login extends HttpServlet{
 			if (pwdOk) {
 	        	HttpSession session = request.getSession(true);
 	        	System.out.println("SESSION ID: " + session.getId());
-	        	userAuth.addSession(user.getUsername() ,session.getId());
-	        	System.out.println("added session to db");
+	        	
+	        	userAuth.addSession( user.getUsername(), session.getId() );
+		        System.out.println("added session to db");
+		   
+	        	List<String> roles = userAuth.getUserRoles(user.getUsername());
+	        	
+	        	for (int i = 0; i < roles.size(); i++) {
+	        		//System.out.println(roles.get(i));
+	        		if (roles.get(i).equals("admin")) {
+	        			// TAKE USER TO ADMIN SPLASH
+	        			//RequestDispatcher dispatcher = context.getRequestDispatcher("/admin");
+	        	        //dispatcher.forward(request, response);
+	        			response.sendRedirect( context + "/user" );
+	        			return;
+	        			
+		        	}
+		        	else if (roles.get(i).equals("user")) {
+		        		// TAKE USER TO USER SPLASH
+		        		response.sendRedirect( context + "/user" );
+		        	}
+		        	else {
+		        		// PERMISSION ERROR
+		        	}
+	        	}
 	        }
 	        else {
 	        	// INVALID CREDS
+	        	// PASSWORD
 	        }
 		} catch (SQLException e) {
 			log( e.getMessage() );
 		}
-        
-        
-		
     }
 	
 	@Override

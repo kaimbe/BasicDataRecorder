@@ -89,7 +89,7 @@ public class SingleWebApp {
         Server server = new Server();
         SelectChannelConnector conn = new SelectChannelConnector();
         conn.setPort(8000);
-        conn.setHost("localhost"); // uncomment to listen only locally
+        //conn.setHost("localhost"); // uncomment to listen only locally
         Connector[] conns = { conn };
         server.setConnectors( conns );
         

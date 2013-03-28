@@ -46,7 +46,7 @@ public class UserAuthDB{
                     "primary key (user_id, role_id) );" );
             stmt.executeUpdate(
                     "create table if not exists sessions (" +
-                        "username text not null unique," +
+                        "username text not null," +
                         "session_id text primary key);");
         }
         finally {
@@ -366,17 +366,17 @@ public class UserAuthDB{
         }
     }
     
-    public String getSessionID(String user) throws SQLException{
+    public List<String> getUserSessions(String user) throws SQLException{
     	Connection conn = null;
         PreparedStatement stmt = null;
-        String result = null;
+        ArrayList<String> list = new ArrayList<String>();
         try {
             conn = openConnection();
             stmt = conn.prepareStatement("select session_id from sessions where username = ?;");
             stmt.setString(1, user);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-            	result = rs.getString(1);
+            	list.add(rs.getString(1));
             }
             
             rs.close();
@@ -389,9 +389,9 @@ public class UserAuthDB{
             closeConnection( conn );
         }
         
-        return result;
+        return list;
     }
-
+    
     public static void main( String[] args ) {
         UserAuthDB ua;
 		try {
