@@ -7,6 +7,7 @@ import java.sql.SQLException;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -72,9 +73,19 @@ public class Login extends HttpServlet{
         String sessionID = request.getRequestedSessionId();
         
         String context = request.getContextPath();
-        
-        HttpSession session = request.getSession(true);
 		
+        Cookie[] co = request.getCookies();
+        
+        for (int i = 0; i < co.length; i++) {
+        	System.out.println("COOKIE NAME: " + co[i].getName());
+        	System.out.println("COOKIE VALUE: " + co[i].getValue());
+        }
+        
+        System.out.println("REMOTE USER: " + username);
+        System.out.println("REQ SESSION ID: " + sessionID);
+        
+        
+        
 		BufferedReader rd = request.getReader();
         String json = readAll( rd );
         
@@ -87,7 +98,7 @@ public class Login extends HttpServlet{
         System.out.println("USERNAME: " + user.getUsername());
         System.out.println("PASSWORD: " + user.getPassword());
         
-        boolean pwdOk;
+        boolean pwdOk = false;
         try {
 			long userID = userAuth.getUserId(user.getUsername());
 			System.out.println(userID);
@@ -96,11 +107,24 @@ public class Login extends HttpServlet{
 			}
 			else {
 				pwdOk = userAuth.checkPassword(user.getUsername(), user.getPassword());
-				System.out.println(pwdOk);
+				System.out.println("IS PWD OK? " + pwdOk);
 			}
+			
+			if (pwdOk) {
+	        	HttpSession session = request.getSession(true);
+	        	System.out.println("SESSION ID: " + session.getId());
+	        	userAuth.addSession(user.getUsername() ,session.getId());
+	        	System.out.println("added session to db");
+	        }
+	        else {
+	        	// INVALID CREDS
+	        }
 		} catch (SQLException e) {
 			log( e.getMessage() );
 		}
+        
+        
+		
     }
 	
 	@Override

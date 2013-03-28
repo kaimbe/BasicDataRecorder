@@ -44,6 +44,10 @@ public class UserAuthDB{
                     "user_id integer not null," +
                     "role_id integer not null," +
                     "primary key (user_id, role_id) );" );
+            stmt.executeUpdate(
+                    "create table if not exists sessions (" +
+                        "username text not null unique," +
+                        "session_id text primary key);");
         }
         finally {
             closeConnection( conn );
@@ -340,6 +344,52 @@ public class UserAuthDB{
         }
     	
     	return pwdOk;
+    }
+    
+    public void addSession(String user, String sessionID) throws SQLException{
+    	Connection conn = null;
+        PreparedStatement stmt = null;
+        
+        try {
+            conn = openConnection();
+            stmt = conn.prepareStatement("insert into sessions values(?,?);");
+            stmt.setString(1, user);
+            stmt.setString(2, sessionID);
+            stmt.executeUpdate();
+            stmt.close();
+        }
+        catch( SQLException ex ) {
+        	ex.printStackTrace();
+        }
+        finally {
+            closeConnection( conn );
+        }
+    }
+    
+    public String getSessionID(String user) throws SQLException{
+    	Connection conn = null;
+        PreparedStatement stmt = null;
+        String result = null;
+        try {
+            conn = openConnection();
+            stmt = conn.prepareStatement("select session_id from sessions where username = ?;");
+            stmt.setString(1, user);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+            	result = rs.getString(1);
+            }
+            
+            rs.close();
+            stmt.close();
+        }
+        catch( SQLException ex ) {
+        	ex.printStackTrace();
+        }
+        finally {
+            closeConnection( conn );
+        }
+        
+        return result;
     }
 
     public static void main( String[] args ) {
