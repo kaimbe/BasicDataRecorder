@@ -10,6 +10,7 @@
 		    };
 		
 		var json = JSON.stringify( creds );
+		
 	    local_ajax_mod.ajax_request( {
 	        method : "POST",
 	        link: window.location.pathname,
@@ -35,7 +36,8 @@
 	}
 	
 	function login_button_init() {
-		var but = document.querySelector('#loginBut');
+		
+		var but = document.querySelector("#loginBut");
 	    but.addEventListener('click', login, false);
 	}
 	
@@ -45,6 +47,7 @@
 	}
 
 window.addEventListener( 'load', function(evt) {
+	
         login_button_init();
         add_user_button_init();
     }, false );

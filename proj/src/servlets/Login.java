@@ -1,5 +1,6 @@
 package servlets;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpSession;
 import com.google.gson.Gson;
 
 import db.BPRMException;
+import db.User;
 
 public class Login extends HttpServlet{
 	
@@ -48,17 +50,40 @@ public class Login extends HttpServlet{
         html.printHtmlEnd(out);
     }
 	
+	private String readAll( BufferedReader rd ) throws IOException {
+        int amt;
+        StringBuilder sb = new StringBuilder();
+        char[] buf = new char[10240];
+        while ( (amt=rd.read(buf, 0, buf.length)) != -1 ) {
+            sb.append( buf, 0, amt );
+        }
+        return sb.toString();
+    }
+	
 	@Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
 		log( request.getRequestURI() );
         util.HTTPUtils.nocache( response );
         PrintWriter out = response.getWriter();
-        String user = request.getRemoteUser();
+        String username = request.getRemoteUser();
+        String sessionID = request.getRequestedSessionId();
+        
         String context = request.getContextPath();
         
-		HttpSession session = request.getSession(true);
+        HttpSession session = request.getSession(true);
 		
+		BufferedReader rd = request.getReader();
+        String json = readAll( rd );
+        
+        User user = (User) gson.fromJson(json, User.class);
+        
+        // Debugging
+        System.out.println("JSON: " + json);
+        System.out.println("REMOTE USER: " + username);
+        System.out.println();
+        System.out.println("USERNAME: " + user.getUsername());
+        System.out.println("PASSWORD: " + user.getPassword());
     }
 	
 	@Override

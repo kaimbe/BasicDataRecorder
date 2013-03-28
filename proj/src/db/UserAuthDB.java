@@ -306,14 +306,18 @@ public class UserAuthDB{
         }
     }
 
-    public static void main( String[] args ) throws Exception {
-    	// need to catch this. need to make sure ua.db exists
-        UserAuthDB ua = new UserAuthDB("ua.db");
-        ua.addUser("rod", "rod");
-        System.out.println("uid = " + ua.getUserId("rod"));
-        List<String> list = ua.getUserNames();
-        for( String s : list ) {
-            System.out.println( s );
-        }
+    public static void main( String[] args ) {
+        UserAuthDB ua;
+		try {
+			ua = new UserAuthDB("ua.db");
+			ua.addUser("rod", "rod");
+			System.out.println("uid = " + ua.getUserId("rod"));
+	        List<String> list = ua.getUserNames();
+	        for( String s : list ) {
+	            System.out.println( s );
+	        }
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
     }
 }

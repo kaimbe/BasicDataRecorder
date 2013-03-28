@@ -111,7 +111,7 @@
     	</init-param>
     	<init-param>
     		<param-name>js</param-name>
-    		<param-value>local_ajax.js,ua.js</param-value>
+    		<param-value>local_ajax.js,login.js</param-value>
     	</init-param>
     	<init-param>
     		<param-name>title</param-name>
@@ -125,10 +125,10 @@
     </servlet-mapping>
     
     <servlet>
-    	<description>User Page</description>
-    	<display-name>User</display-name>
-    	<servlet-name>User</servlet-name>
-    	<servlet-class>servlets.User</servlet-class>
+    	<description>User Splash</description>
+    	<display-name>UserSplash</display-name>
+    	<servlet-name>UserSplash</servlet-name>
+    	<servlet-class>servlets.UserSplash</servlet-class>
     	<init-param>
     		<param-name>css</param-name>
     		<param-value>proj.css</param-value>
@@ -139,34 +139,34 @@
     	</init-param>
     	<init-param>
     		<param-name>title</param-name>
-    		<param-value>User</param-value>
+    		<param-value>User Splash</param-value>
     	</init-param>
     </servlet>
     <servlet-mapping>
-    	<servlet-name>User</servlet-name>
+    	<servlet-name>UserSplash</servlet-name>
     	<url-pattern>/user/*</url-pattern>
     </servlet-mapping>
     
     <servlet>
-    	<description>Admin Page</description>
-    	<display-name>Admin</display-name>
-    	<servlet-name>Admin</servlet-name>
-    	<servlet-class>servlets.Admin</servlet-class>
+    	<description>Admin Splash</description>
+    	<display-name>AdminSplash</display-name>
+    	<servlet-name>AdminSplash</servlet-name>
+    	<servlet-class>servlets.AdminSplash</servlet-class>
     	<init-param>
     		<param-name>css</param-name>
     		<param-value>proj.css</param-value>
     	</init-param>
     	<init-param>
     		<param-name>js</param-name>
-    		<param-value>local_ajax.js,proj.js</param-value>
+    		<param-value>local_ajax.js,login.js</param-value>
     	</init-param>
     	<init-param>
     		<param-name>title</param-name>
-    		<param-value>Admin</param-value>
+    		<param-value>Admin Splash</param-value>
     	</init-param>
     </servlet>
     <servlet-mapping>
-    	<servlet-name>Admin</servlet-name>
+    	<servlet-name>AdminSplash</servlet-name>
     	<url-pattern>/admin/*</url-pattern>
     </servlet-mapping>
 

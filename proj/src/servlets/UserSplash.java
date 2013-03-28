@@ -14,7 +14,7 @@ import com.google.gson.Gson;
 import db.BPRMException;
 
 
-public class Admin extends HttpServlet{
+public class UserSplash extends HttpServlet{
 	
 	private util.HTMLTemplates html;
    // private BloodPressureRecordsManager bpm;
@@ -35,9 +35,8 @@ public class Admin extends HttpServlet{
         out.println("<div class='nav'>");
         html.printUserNav(out);
         out.println("</div>");
-        out.println("<div class='adminsplash'>");
+        out.println("<div class='usersplash'>");
         out.println("<h1> Welcome " + request.getRemoteUser() + "!</h1>");
-        out.println("<h1> You have admin privileges!");
         out.println("<h1>Published Projects:</h1>");
         out.println("<ul>");
         out.println("<li>No projects yet");
