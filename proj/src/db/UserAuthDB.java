@@ -305,6 +305,42 @@ public class UserAuthDB{
             closeConnection( conn );
         }
     }
+    
+    public boolean checkPassword(String user, String pwd) throws SQLException {
+    	boolean pwdOk = false;
+    	Connection conn = null;
+        PreparedStatement stmt = null;
+        
+        try {
+            conn = openConnection();
+            stmt = conn.prepareStatement("select username,pwd from users where (username = ?) and (pwd = ?);");
+            stmt.setString(1, user);
+            stmt.setString(2, pwd);
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+            	String un = rs.getString(1);
+            	String pw = rs.getString(2);
+            	
+            	if (un.equals("") || pw.equals("") || (un == null) || (pw == null)) {
+            		pwdOk = false;
+            	}
+            	else {
+            		pwdOk = true;
+            	}
+            }
+            rs.close();
+            stmt.close();
+        }
+        catch( SQLException ex ) {
+        	ex.printStackTrace();
+        }
+        finally {
+            closeConnection( conn );
+        }
+    	
+    	return pwdOk;
+    }
 
     public static void main( String[] args ) {
         UserAuthDB ua;
@@ -316,8 +352,8 @@ public class UserAuthDB{
 	        for( String s : list ) {
 	            System.out.println( s );
 	        }
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} catch (SQLException ex) {
+			ex.printStackTrace();
 		}
     }
 }

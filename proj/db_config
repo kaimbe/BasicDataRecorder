@@ -1,5 +1,5 @@
 jdbcdriver = org.sqlite.JDBC
-url = jdbc:sqlite:bp/ua.db
+url = jdbc:sqlite:proj/ua.db
 # username and password not used by sqlite but JDBCLoginService wants them
 username = jetty
 password = jetty

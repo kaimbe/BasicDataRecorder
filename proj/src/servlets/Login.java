@@ -3,6 +3,7 @@ package servlets;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -15,11 +16,12 @@ import com.google.gson.Gson;
 
 import db.BPRMException;
 import db.User;
+import db.UserAuthDB;
 
 public class Login extends HttpServlet{
 	
 	private util.HTMLTemplates html;
-   // private BloodPressureRecordsManager bpm;
+	private UserAuthDB userAuth;
     private Gson gson = new Gson();
 	
 	@Override
@@ -84,6 +86,21 @@ public class Login extends HttpServlet{
         System.out.println();
         System.out.println("USERNAME: " + user.getUsername());
         System.out.println("PASSWORD: " + user.getPassword());
+        
+        boolean pwdOk;
+        try {
+			long userID = userAuth.getUserId(user.getUsername());
+			System.out.println(userID);
+			if(userID == -1) {
+				// INVALID CREDS
+			}
+			else {
+				pwdOk = userAuth.checkPassword(user.getUsername(), user.getPassword());
+				System.out.println(pwdOk);
+			}
+		} catch (SQLException e) {
+			log( e.getMessage() );
+		}
     }
 	
 	@Override
@@ -91,14 +108,12 @@ public class Login extends HttpServlet{
         super.init( config ); // super.init call is required
         html = util.HTMLTemplates.newHTMLTemplates( this );
         
-        /* 
         try {
-           // bpm = new SQLiteBPM( Constants.DB_PATH );
+            userAuth = new UserAuthDB( Constants.UA_DB_PATH );
         }
-        catch( BPRMException ex ) {
-           // bpm = null;
+        catch( SQLException ex ) {
+            userAuth = null;
             log( ex.getMessage() );
         }
-        */
     }
 }
