@@ -33,7 +33,7 @@ public class AdminSplash extends HttpServlet{
         out.println("<body>");
         
         out.println("<div class='nav'>");
-        html.printUserNav(out);
+        html.printAdminNav(out);
         out.println("</div>");
         out.println("<div class='adminsplash'>");
         out.println("<h1> Welcome " + request.getRemoteUser() + "!</h1>");
@@ -57,15 +57,5 @@ public class AdminSplash extends HttpServlet{
     public void init(ServletConfig config) throws ServletException {
         super.init( config ); // super.init call is required
         html = util.HTMLTemplates.newHTMLTemplates( this );
-        
-        /* 
-        try {
-           // bpm = new SQLiteBPM( Constants.DB_PATH );
-        }
-        catch( BPRMException ex ) {
-           // bpm = null;
-            log( ex.getMessage() );
-        }
-        */
     }
 }

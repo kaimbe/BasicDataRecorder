@@ -96,13 +96,11 @@ public class SingleWebApp {
         WebAppContext webapp = new WebAppContext(warDirName, contextPath);
         // http://www.eclipse.org/jetty/documentation/current/configuring-security.html
         
-        
         if ( loginService != null) {
             SecurityHandler sh = webapp.getSecurityHandler();
             sh.setLoginService( loginService );
         }
         
-
         server.setHandler(webapp);
         server.setGracefulShutdown(0);
         server.start();

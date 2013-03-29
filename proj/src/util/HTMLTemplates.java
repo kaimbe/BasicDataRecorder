@@ -78,10 +78,10 @@ public class HTMLTemplates {
     	pw.println("</div>");
     	pw.println("<div id='usernav'>");
     	pw.println("<ul class='navlist'>");
-    	pw.println("<li><a href='My_Projects'>My Projects</a></li>");
-    	pw.println("<li><a href='Power_Search'>Power Search</a></li>");
-    	pw.println("<li><a href='My_Account'>My Account</a></li>");
-    	pw.println("<li><a href='Logout'>Logout</a></li>");
+    	pw.println("<li><a href='user/my_projects'>My Projects</a></li>");
+    	pw.println("<li><a href='user/power_search'>Power Search</a></li>");
+    	pw.println("<li><a href='user/my_account'>My Account</a></li>");
+    	pw.println("<li><a href='logout'>Logout</a></li>");
     	pw.println("</ul>");
     	pw.println("</div>");
     }
@@ -93,8 +93,8 @@ public class HTMLTemplates {
     	pw.println("</div>");
     	pw.println("<div id='adminnav'>");
     	pw.println("<ul class='adminlist'>");
-    	pw.println("<li><a href='Manage_Projects'>Manage Projects</a></li>");
-    	pw.println("<li><a href='Manage_Users'>Manage Users</a></li>");
+    	pw.println("<li><a href='admin/manage_projects'>Manage Projects</a></li>");
+    	pw.println("<li><a href='admin/manage_users'>Manage Users</a></li>");
     	pw.println("</ul>");
     	pw.println("</div>");
     	
