@@ -97,7 +97,6 @@ public class HTMLTemplates {
     	pw.println("<li><a href='admin/manage_users'>Manage Users</a></li>");
     	pw.println("</ul>");
     	pw.println("</div>");
-    	
     }
 
     public String escape( String str ) {

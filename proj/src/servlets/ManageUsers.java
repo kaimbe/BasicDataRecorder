@@ -29,7 +29,7 @@ import com.google.gson.Gson;
  *
  * @author Rod Byrne
  */
-public class UserEdit extends HttpServlet {
+public class ManageUsers extends HttpServlet {
     private util.HTMLTemplates html;
     private UserAuthDB userAuth;
     private Gson gson = new Gson();
