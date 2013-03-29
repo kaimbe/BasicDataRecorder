@@ -13,7 +13,13 @@ import com.google.gson.Gson;
 
 import db.BPRMException;
 
-
+/**
+ * 
+ * The user splash
+ * 
+ * @author Matthew Newell
+ *
+ */
 public class UserSplash extends HttpServlet{
 	
 	private util.HTMLTemplates html;

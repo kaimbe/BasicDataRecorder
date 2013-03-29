@@ -9,6 +9,7 @@ import javax.servlet.ServletContext;
  * HTMLTemplates provide a very simple html template.
  *
  * @author Rod Byrne
+ * @author Matthew Newell
  */
 public class HTMLTemplates {
     private String contextPath;

@@ -25,9 +25,10 @@ import com.google.gson.Gson;
 
 /**
  *
- * Provide user account adminstration
+ * Manage Users
  *
  * @author Rod Byrne
+ * @author Matthew Newell
  */
 public class ManageUsers extends HttpServlet {
     private util.HTMLTemplates html;

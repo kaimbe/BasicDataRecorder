@@ -4,6 +4,8 @@ package servlets;
  * @author Matthew Newell
  */
 public interface Constants {
+	String USER_SPLASH = "/user";
+	String ADMIN_SPLASH = "/admin";
     String DB_ERR_PAGE = "/db-error.html"; 
     String DATA_ERR_PAGE = "/data-entry-error.html"; 
     String INVALID_URL_PAGE = "/invalid.html"; 

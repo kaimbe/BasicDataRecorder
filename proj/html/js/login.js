@@ -18,7 +18,13 @@
 	        mime : 'application/json',
 	        ok_fn :  function( req ) {
 	            try {
-	                var recAdded = JSON.parse( req.responseText );
+	                var user = JSON.parse( req.responseText );
+	                if (user === "admin") {
+	                	window.location = "admin";
+	                }
+	                else if (user === "user") {
+	                	window.location = "user";
+	                }
 	            }
 	            catch( e ) {
 	                console.log( e );

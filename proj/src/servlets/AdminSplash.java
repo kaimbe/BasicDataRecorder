@@ -13,11 +13,16 @@ import com.google.gson.Gson;
 
 import db.BPRMException;
 
-
+/**
+ * 
+ * The admin splash
+ * 
+ * @author Matthew Newell
+ *
+ */
 public class AdminSplash extends HttpServlet{
 	
 	private util.HTMLTemplates html;
-   // private BloodPressureRecordsManager bpm;
     private Gson gson = new Gson();
 	
 	@Override
