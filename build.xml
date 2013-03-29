@@ -60,7 +60,7 @@
                 <path refid="app-jars"/>
             </classpath>
             <arg value="-j"/>
-            <arg value="bp/db_config"/>
+            <arg value="${app.name}/db_config"/>
             <arg value="${app.wardir}"/>
             <arg value="/${app.name}"/>
         </java>

@@ -1,6 +1,8 @@
 (function() {
 	
 	function login( evt ) {
+		j_security_check();
+		/*
 		var un = document.querySelector('#un');
 		var pw = document.querySelector('#pw');
 		
@@ -29,6 +31,7 @@
 	            console.log( req );
 	        }
 	    } );
+	    */
 	}
 	
 	function new_account( evt ) {

@@ -40,22 +40,7 @@ public class Login extends HttpServlet{
         System.out.println("REQ SESSION ID: " + reqSesID);
         System.out.println("REMOTE USER: " + username);
        
-        try {
-        	List<String> sessions = userAuth.getUserSessions(username);
-        	System.out.println("SESSIONS: ");
-            for (String s : sessions) {
-            	
-            	System.out.println(s);
-            	if (reqSesID.equals(s)) {
-            		// ALREADY LOGGED IN
-            		// TAKE USER TO SPLASH
-            		
-            	}
-            }
-        }
-        catch (SQLException e) {
-        	log( e.getMessage() );
-	    }
+        
         
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
@@ -63,15 +48,18 @@ public class Login extends HttpServlet{
         out.println("<body>");
         out.println("<h1>Login</h1>");
         out.println("<div id='login'>");
-        out.println("<p>Please Enter Your Credentials:</p><br>");
+        out.println("<p>Please Enter Your Credentials:</p>");
+        out.println("<form method='POST' action='j_security_check'>");
         out.print("<label>");
-        out.print("Username: <input id='un' type='text' size='15'>");
+        out.print("Username: <input id='un' type='text' size='15' name='j_username'>");
         out.println("</label><br>");
         out.print("<label>");
-        out.print("Password: <input id='pw' type='password' size='15'>");
+        out.print("Password: <input id='pw' type='password' size='15' name='j_password'>");
         out.println("</label><br>");
-        out.println("<button id='loginBut'>Login</button><br>");
-        out.println("<button id='newAccBut'>Create New Account</button><br>");
+        out.println("<input name='submit' type='submit' value='Login'>");
+        out.println("</form>");
+        //out.println("<button id='loginBut'>Login</button><br>");
+       // out.println("<button id='newAccBut'>Create New Account</button><br>");
         out.println("</div>");
         
         out.println("</body>");
@@ -98,9 +86,9 @@ public class Login extends HttpServlet{
         String reqSesID = request.getRequestedSessionId();
         String context = request.getContextPath();
         
+        response.setContentType("text/html");
         
-        
-		
+		/*
         if ( userAuth == null ) {
             response.sendRedirect( context + Constants.DB_ERR_PAGE );
             return;
@@ -126,7 +114,7 @@ public class Login extends HttpServlet{
 			if(userID == -1) {
 				// INVALID CREDS
 				// USERNAME
-				response.sendRedirect( context + Constants.INVALID_USER );
+				
 				return;
 			}
 			else {
@@ -147,8 +135,7 @@ public class Login extends HttpServlet{
 	        		//System.out.println(roles.get(i));
 	        		if (roles.get(i).equals("admin")) {
 	        			// TAKE USER TO ADMIN SPLASH
-	        			//RequestDispatcher dispatcher = context.getRequestDispatcher("/admin");
-	        	        //dispatcher.forward(request, response);
+	        			
 	        			response.sendRedirect( context + "/user" );
 	        			return;
 	        			
@@ -169,6 +156,7 @@ public class Login extends HttpServlet{
 		} catch (SQLException e) {
 			log( e.getMessage() );
 		}
+		*/
     }
 	
 	@Override

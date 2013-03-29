@@ -7,8 +7,6 @@
     http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" 
     version="3.0">
 
-    <display-name>BPEdit</display-name>
-
     <!-- handels static content -->
     <servlet>
         <servlet-name>default</servlet-name>
@@ -39,7 +37,7 @@
     	</init-param>
     	<init-param>
     		<param-name>js</param-name>
-    		<param-value>local_ajax.js,login.js</param-value>
+    		<param-value>local_ajax.js</param-value>
     	</init-param>
     	<init-param>
     		<param-name>title</param-name>
@@ -63,7 +61,7 @@
     	</init-param>
     	<init-param>
     		<param-name>js</param-name>
-    		<param-value>local_ajax.js,login.js</param-value>
+    		<param-value>local_ajax.js</param-value>
     	</init-param>
     	<init-param>
     		<param-name>title</param-name>
@@ -86,7 +84,7 @@
     	</init-param>
     	<init-param>
     		<param-name>js</param-name>
-    		<param-value>local_ajax.js,login.js</param-value>
+    		<param-value>local_ajax.js</param-value>
     	</init-param>
     	<init-param>
     		<param-name>title</param-name>
@@ -121,12 +119,15 @@
             <role-name>admin</role-name> 
         </auth-constraint>
     </security-constraint>
-
+    
     <login-config>
-        <!-- BASIC or DIGEST -->
-        <auth-method>BASIC</auth-method> 
-        <realm-name>Test Realm</realm-name>
-    </login-config>
+    	<auth-method>FORM</auth-method>
+    	<realm-name>Test Realm</realm-name>
+    	<form-login-config>
+       		<form-login-page>/login</form-login-page>
+       		<form-error-page>/logonError.html</form-error-page>
+    	</form-login-config>
+  	</login-config>
 
     <!--
     <error-page>

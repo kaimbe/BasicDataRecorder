@@ -44,10 +44,6 @@ public class UserAuthDB{
                     "user_id integer not null," +
                     "role_id integer not null," +
                     "primary key (user_id, role_id) );" );
-            stmt.executeUpdate(
-                    "create table if not exists sessions (" +
-                        "username text not null," +
-                        "session_id text primary key);");
         }
         finally {
             closeConnection( conn );
@@ -310,98 +306,10 @@ public class UserAuthDB{
         }
     }
     
-    public boolean checkPassword(String user, String pwd) throws SQLException {
-    	boolean pwdOk = false;
-    	Connection conn = null;
-        PreparedStatement stmt = null;
-        
-        try {
-            conn = openConnection();
-            stmt = conn.prepareStatement("select username,pwd from users where (username = ?) and (pwd = ?);");
-            stmt.setString(1, user);
-            stmt.setString(2, pwd);
-            ResultSet rs = stmt.executeQuery();
-            
-            while (rs.next()) {
-            	String un = rs.getString(1);
-            	String pw = rs.getString(2);
-            	
-            	if (un.equals("") || pw.equals("") || (un == null) || (pw == null)) {
-            		pwdOk = false;
-            	}
-            	else {
-            		pwdOk = true;
-            	}
-            }
-            rs.close();
-            stmt.close();
-        }
-        catch( SQLException ex ) {
-        	ex.printStackTrace();
-        }
-        finally {
-            closeConnection( conn );
-        }
-    	
-    	return pwdOk;
-    }
-    
-    public void addSession(String user, String sessionID) throws SQLException{
-    	Connection conn = null;
-        PreparedStatement stmt = null;
-        
-        try {
-            conn = openConnection();
-            stmt = conn.prepareStatement("insert into sessions values(?,?);");
-            stmt.setString(1, user);
-            stmt.setString(2, sessionID);
-            stmt.executeUpdate();
-            stmt.close();
-        }
-        catch( SQLException ex ) {
-        	ex.printStackTrace();
-        }
-        finally {
-            closeConnection( conn );
-        }
-    }
-    
-    public List<String> getUserSessions(String user) throws SQLException{
-    	Connection conn = null;
-        PreparedStatement stmt = null;
-        ArrayList<String> list = new ArrayList<String>();
-        try {
-            conn = openConnection();
-            stmt = conn.prepareStatement("select session_id from sessions where username = ?;");
-            stmt.setString(1, user);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-            	list.add(rs.getString(1));
-            }
-            
-            rs.close();
-            stmt.close();
-        }
-        catch( SQLException ex ) {
-        	ex.printStackTrace();
-        }
-        finally {
-            closeConnection( conn );
-        }
-        
-        return list;
-    }
-    
     public static void main( String[] args ) {
         UserAuthDB ua;
 		try {
 			ua = new UserAuthDB("ua.db");
-			ua.addUser("rod", "rod");
-			System.out.println("uid = " + ua.getUserId("rod"));
-	        List<String> list = ua.getUserNames();
-	        for( String s : list ) {
-	            System.out.println( s );
-	        }
 		} catch (SQLException ex) {
 			ex.printStackTrace();
 		}
