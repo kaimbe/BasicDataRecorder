@@ -183,7 +183,7 @@ public class ManageUsers extends HttpServlet {
                 // demonstrate using a class with json
                 UserPasswordEntry entry = gson.fromJson(json, UserPasswordEntry.class); 
                 userAuth.addUser( entry.user, entry.password );
-                out.print("{\"redirect\":\"users\"}");
+                out.print("{\"redirect\":\"manage_users\"}");
             }
             catch( SQLException ex ) {
                 log( ex.getMessage() );

@@ -82,6 +82,10 @@ public class HTMLTemplates {
     	
     	pw.print("<li><a href='");
     	pw.print(contextPath + "/user");
+    	pw.println("'>Home</a></li>");
+    	
+    	pw.print("<li><a href='");
+    	pw.print(contextPath + "/user");
     	pw.println("/my_projects'>My Projects</a></li>");
     	
     	pw.print("<li><a href='");
