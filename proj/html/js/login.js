@@ -18,12 +18,15 @@
 	        mime : 'application/json',
 	        ok_fn :  function( req ) {
 	            try {
-	                var user = JSON.parse( req.responseText );
-	                if (user === "admin") {
+	                var res = JSON.parse( req.responseText );
+	                if (res === "admin") {
 	                	window.location = "admin";
 	                }
-	                else if (user === "user") {
+	                else if (res === "user") {
 	                	window.location = "user";
+	                }
+	                else if (res === "error") {
+	                	window.location = "login-error.html";
 	                }
 	            }
 	            catch( e ) {

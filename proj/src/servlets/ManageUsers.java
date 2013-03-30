@@ -53,8 +53,13 @@ public class ManageUsers extends HttpServlet {
         PrintWriter out = response.getWriter();
         html.printHtmlStart(out);
         out.println("<body>");
+        out.println("<div class='nav'>");
+        html.printAdminNav(out);
+        out.println("</div>");
+        out.println("<div class='usersplash'>");
         userSection( out );
         //roleSection( out );  TODO
+        out.println("</div>");
         out.println("</body>");
         html.printHtmlEnd(out);
     }

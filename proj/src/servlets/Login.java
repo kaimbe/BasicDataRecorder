@@ -88,16 +88,20 @@ public class Login extends HttpServlet{
 		log( request.getRequestURI() );
         util.HTTPUtils.nocache( response );
         PrintWriter out = response.getWriter();
-        
+        response.setContentType("application/json");
 		BufferedReader rd = request.getReader();
         String json = readAll( rd );
         
         User user = (User) gson.fromJson(json, User.class);
         
         request.getSession(true);
-        request.login(user.getUsername(), user.getPassword());
         
-        response.setContentType("application/json");
+        try {
+        	request.login(user.getUsername(), user.getPassword());
+        }
+        catch (ServletException e) {
+        	out.print( gson.toJson("error") );
+        }
         
         if (request.isUserInRole("admin")) {
         	out.print( gson.toJson("admin") );
