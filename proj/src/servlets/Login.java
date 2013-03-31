@@ -16,7 +16,7 @@ import javax.servlet.http.HttpSession;
 
 import com.google.gson.Gson;
 
-import db.BPRMException;
+import db.PMException;
 import db.User;
 import db.UserAuthDB;
 

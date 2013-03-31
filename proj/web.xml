@@ -51,6 +51,30 @@
     </servlet-mapping>
     
     <servlet>
+    	<description>My Projects</description>
+    	<display-name>MyProjects</display-name>
+    	<servlet-name>MyProjects</servlet-name>
+    	<servlet-class>servlets.MyProjects</servlet-class>
+    	<init-param>
+    		<param-name>css</param-name>
+    		<param-value>proj.css</param-value>
+    	</init-param>
+    	<init-param>
+    		<param-name>js</param-name>
+    		<param-value>local_ajax.js,my_projects.js</param-value>
+    	</init-param>
+    	<init-param>
+    		<param-name>title</param-name>
+    		<param-value>My Projects</param-value>
+    	</init-param>
+    </servlet>
+    
+    <servlet-mapping>
+    	<servlet-name>MyProjects</servlet-name>
+    	<url-pattern>/user/my_projects/*</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
     	<description>Admin Splash</description>
     	<display-name>AdminSplash</display-name>
     	<servlet-name>AdminSplash</servlet-name>
@@ -96,6 +120,30 @@
     <servlet-mapping>
     	<servlet-name>ManageUsers</servlet-name>
     	<url-pattern>/admin/manage_users/*</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+    	<description>Manage Projects</description>
+    	<display-name>ManageProjects</display-name>
+    	<servlet-name>ManageProjects</servlet-name>
+    	<servlet-class>servlets.ManageProjects</servlet-class>
+    	<init-param>
+    		<param-name>css</param-name>
+    		<param-value>proj.css</param-value>
+    	</init-param>
+    	<init-param>
+    		<param-name>js</param-name>
+    		<param-value>local_ajax.js</param-value>
+    	</init-param>
+    	<init-param>
+    		<param-name>title</param-name>
+    		<param-value>Manage Projects</param-value>
+    	</init-param>
+    </servlet>
+    
+    <servlet-mapping>
+    	<servlet-name>ManageProjects</servlet-name>
+    	<url-pattern>/admin/manage_projects/*</url-pattern>
     </servlet-mapping>
     
     <servlet>

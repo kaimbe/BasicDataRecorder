@@ -307,9 +307,8 @@ public class UserAuthDB{
     }
     
     public static void main( String[] args ) {
-        UserAuthDB ua;
 		try {
-			ua = new UserAuthDB("ua.db");
+			new UserAuthDB("ua.db");
 		} catch (SQLException ex) {
 			ex.printStackTrace();
 		}
