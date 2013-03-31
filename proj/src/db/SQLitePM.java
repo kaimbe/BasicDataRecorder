@@ -118,6 +118,52 @@ public class SQLitePM implements ProjectManager{
 	        }
 	        return rowid;
 		}
+		
+		public void updateProject( Project proj ) throws PMException {
+	        Connection conn = null;
+	        try {
+	            conn = openConnection();
+	            PreparedStatement stmt = conn.prepareStatement(
+	                "update projects set projname=?, " +
+	                "owner=?" +
+	                "where projid=?" );
+	            stmt.setString(1, proj.getName());
+	            stmt.setString(2, proj.getOwner());
+	            stmt.setLong(3, proj.getRecordID());
+	            stmt.executeUpdate();
+	            stmt.close();
+	        }
+	        catch( SQLException ex ) {
+	            throw new PMException( ex.getMessage() );
+	        }
+	        finally {
+	            closeConnection( conn );
+	        }
+	    }
+		
+		public void deleteProject( long rowid ) throws PMException {
+	        Connection conn = null;
+	        try {
+	            conn = openConnection();
+	            PreparedStatement stmt = conn.prepareStatement(
+	                "delete from projects where projid=?");
+	            stmt.setLong(1, rowid);
+	            stmt.executeUpdate();
+	            stmt.close();
+	            
+	            PreparedStatement usr = conn.prepareStatement(
+		                "delete from user_projects where projid=?");
+	            usr.setLong(1, rowid);
+	            usr.executeUpdate();
+	            usr.close();
+	        }
+	        catch( SQLException ex ) {
+	            throw new PMException( ex.getMessage() );
+	        }
+	        finally {
+	            closeConnection( conn );
+	        }
+		}
 
 		@Override
 		public void addEntryDefn(String projectName, int dataFieldIndex, String dataFieldName, String dataFieldType) throws PMException {
@@ -265,7 +311,23 @@ public class SQLitePM implements ProjectManager{
 
 		@Override
 		public List<Project> getAllProjects() throws PMException {
-			// TODO Auto-generated method stub
-			return null;
+			Connection conn = null;
+	        List<Project> list = null;
+	        try {
+	            conn = openConnection();
+	            PreparedStatement stmt = conn.prepareStatement(
+	                "select * from projects");
+	            ResultSet rs = stmt.executeQuery();
+	            list = listFromResultSet( rs );
+	            rs.close();
+	            stmt.close();
+	        }
+	        catch( SQLException ex ) {
+	            throw new PMException( ex.getMessage() );
+	        }
+	        finally {
+	            closeConnection( conn );
+	        }
+	        return list;
 		}
 }

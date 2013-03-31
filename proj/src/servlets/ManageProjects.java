@@ -37,61 +37,35 @@ public class ManageProjects extends HttpServlet{
         html.printHtmlStart(out);
         out.println("<body>");
         out.println("<div class='nav'>");
-        
-        if (request.isUserInRole("admin")) {
-        	html.printAdminNav(out);
-        }
-        else if (request.isUserInRole("user")) {
-        	html.printUserNav(out);
-        }
-        
+        html.printAdminNav(out);
         out.println("</div>");
         
-        String recName = "";
-        
-        
-        
-        
         out.println("<div class='usersplash'>");
+        out.println("<h1>Manage Projects</h1>");
         out.println("<table class='editor'>");
         out.println("<tr>");
         out.print("<td>No</td><td>Project Name</td>");
-        out.println("<td>Project Owner</td>");
+        out.println("<td>Project Owner</td><td>Command</td>");
         out.println("</tr>");
-        /*
+        
         try {
             List<Project> list = pm.getAllProjects();
-            for( Project proj : list ) { //TODO
+            for( Project proj : list ) {
                 out.println("<tr>");
                 out.printf("<td>%d</td>%n", proj.getRecordID() );
-                Date d = new Date( rec.getTimeStamp() );
-                out.printf("<td>%s</td>%n", dtFormat.format( d ));
-                out.printf("<td>%6.1f</td>%n", rec.getSystolic());
-                out.printf("<td>%6.1f</td>%n", rec.getDiastolic());
-                out.printf("<td>%6.1f</td>%n", rec.getPulseRate());
-                String ed = String.format("<button class='edit' recno='%d'>Edit</button>",
-                    rec.getRecordID() );
+                out.printf("<td>%s</td>%n", proj.getName());
+                out.printf("<td>%s</td>%n", proj.getOwner());
+               
                 String del = String.format("<button class='del' recno='%d'>Delete</button>",
-                    rec.getRecordID() );
-                out.print( "<td>" + ed + del + "</td>" );
+                    proj.getRecordID() );
+                out.print( "<td>" + del + "</td>" );
                 out.println("</tr>");
             }
         }
-        catch( BPRMException ex ) {
+        catch( PMException ex ) {
             log( ex.getMessage() );
             out.println("<tr><td>Data base error</td></tr>");
         }
-        */
-        // the add a reading form
-        out.println("<tr>");
-        out.println("<td>Edit</td>");
-        out.println("<td><input type='text' id='date' size='12'></td>");
-        out.println("<td><input type='text' id='systolic' size='5'></td>");
-        out.println("<td><input type='text' id='diastolic' size='5'></td>");
-        out.println("<td><input type='text' id='pulse' size='5'></td>");
-        out.println("<td><input type='button' id='add-bp' value='Add'></td>");
-        out.println("</tr>");
-        out.println("</table>");
         
         out.println("</div>");
         out.println("</body>");
@@ -114,11 +88,44 @@ public class ManageProjects extends HttpServlet{
 		log( request.getRequestURI() );
         util.HTTPUtils.nocache( response );
         PrintWriter out = response.getWriter();
-        response.setContentType("application/json");
-		BufferedReader rd = request.getReader();
-        String json = readAll( rd );
-        
-        
+        String user = request.getRemoteUser();
+        String context = request.getContextPath();
+
+        if ( pm == null ) {
+            response.sendRedirect( context + Constants.DB_ERR_PAGE );
+            return;
+        }
+        if ( ! request.isUserInRole("user") ) {
+            response.sendError( HttpServletResponse.SC_FORBIDDEN, "No premission");
+            return;
+        }
+
+        String pathInfo = request.getPathInfo();
+        if ( pathInfo != null && pathInfo.startsWith("/delete") ){
+            BufferedReader rd = request.getReader();
+            String json = readAll( rd );
+            try {
+                long recid = gson.fromJson(json, long.class);
+                pm.deleteProject( recid );
+                log("deleting: " + user + "=" + recid );
+                response.setContentType("application/json");
+                out.print( gson.toJson("ok") ); // ok
+            }
+            catch( NumberFormatException ex ) {
+                log( ex.getMessage() );
+                response.sendRedirect( context + Constants.DATA_ERR_PAGE );
+                return;
+            }
+            catch( PMException ex ) {
+                log( ex.getMessage() );
+                response.sendRedirect( context + Constants.DB_ERR_PAGE );
+                return;
+            }
+        }
+        else {
+            response.sendRedirect( context + Constants.INVALID_URL_PAGE );
+            return;
+        }
     }
 
 	@Override

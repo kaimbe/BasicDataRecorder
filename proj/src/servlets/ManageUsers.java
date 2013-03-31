@@ -57,6 +57,7 @@ public class ManageUsers extends HttpServlet {
         html.printAdminNav(out);
         out.println("</div>");
         out.println("<div class='usersplash'>");
+        out.println("<h1>Manage Users</h1>");
         userSection( out );
         //roleSection( out );  TODO
         out.println("</div>");

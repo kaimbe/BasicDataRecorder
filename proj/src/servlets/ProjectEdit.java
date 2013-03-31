@@ -3,8 +3,11 @@ package servlets;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -14,86 +17,77 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
 
-import db.BPRMException;
-import db.BloodPressure;
-import db.PMException;
-import db.Project;
-import db.SQLiteBPM;
-import db.SQLitePM;
-import db.User;
 
-public class MyProjects extends HttpServlet{
+public class ProjectEdit extends HttpServlet{
+	/*
 	private util.HTMLTemplates html;
+    private ProjectManager pm;
     private Gson gson = new Gson();
-    private SQLitePM pm;
 
-	@Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    private SimpleDateFormat dtFormat;
+
+    @Override
+    protected void doGet(
+        HttpServletRequest request, HttpServletResponse response)
+    throws ServletException, IOException
     {
         log( request.getRequestURI() );
         util.HTTPUtils.nocache( response );
         String context = request.getContextPath();
+
         String user = request.getRemoteUser();
+        if ( pm == null ) {
+            response.sendRedirect( context + Constants.DB_ERR_PAGE );
+            return;
+        }
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
         html.printHtmlStart(out);
         out.println("<body>");
-        out.println("<div class='nav'>");
-        
-        if (request.isUserInRole("admin")) {
-        	html.printAdminNav(out);
-        }
-        else if (request.isUserInRole("user")) {
-        	html.printUserNav(out);
-        }
-        
-        out.println("</div>");
-        
-        out.println("<div class='usersplash'>");
-        out.println("<h1>My Projects</h1>");
+        out.printf("<h1>Blood Pressure Editor: %s</h1>%n", user);
         out.println("<table class='editor'>");
         out.println("<tr>");
-        out.print("<td>No</td><td>Project Name</td>");
-        out.println("<td>Project Owner</td>");
-        out.println("<td>Command</td>");
+        out.print("<td>No</td><td>YY/MM/DD HH:MM</td><td>Systolic</td>");
+        out.println("<td>Diastolic</td><td>Pulse</td><td>Command</td>");
         out.println("</tr>");
-        
         try {
-            List<Project> list = pm.getOwnerProjects( user );
-            for( Project proj : list ) {
+            List<BloodPressure> list = bpm.getRecords( user );
+            for( BloodPressure rec : list ) {
                 out.println("<tr>");
-                out.printf("<td>%d</td>%n", proj.getRecordID() );
-                out.printf("<td><a href='" + context + Constants.PROJECT_EDIT + "/" + proj.getName() + "'>" + "%s</a></td>%n", proj.getName());
-                out.printf("<td>%s</td>%n", proj.getOwner());
-               
+                out.printf("<td>%d</td>%n", rec.getRecordID() );
+                Date d = new Date( rec.getTimeStamp() );
+                out.printf("<td>%s</td>%n", dtFormat.format( d ));
+                out.printf("<td>%6.1f</td>%n", rec.getSystolic());
+                out.printf("<td>%6.1f</td>%n", rec.getDiastolic());
+                out.printf("<td>%6.1f</td>%n", rec.getPulseRate());
                 String ed = String.format("<button class='edit' recno='%d'>Edit</button>",
-                    proj.getRecordID() );
+                    rec.getRecordID() );
                 String del = String.format("<button class='del' recno='%d'>Delete</button>",
-                    proj.getRecordID() );
+                    rec.getRecordID() );
                 out.print( "<td>" + ed + del + "</td>" );
                 out.println("</tr>");
             }
         }
-        catch( PMException ex ) {
+        catch( BPRMException ex ) {
             log( ex.getMessage() );
             out.println("<tr><td>Data base error</td></tr>");
         }
-        
-        // the add a project form
+        // the add a reading form
         out.println("<tr>");
         out.println("<td>Edit</td>");
-        out.println("<td><input type='text' id='proj-name' size='10'></td>");
-        out.println("<td><input type='text' id='proj-owner' size='10'></td>");
-        out.println("<td><input type='button' id='add-proj' value='Add'></td>");
+        out.println("<td><input type='text' id='date' size='12'></td>");
+        out.println("<td><input type='text' id='systolic' size='5'></td>");
+        out.println("<td><input type='text' id='diastolic' size='5'></td>");
+        out.println("<td><input type='text' id='pulse' size='5'></td>");
+        out.println("<td><input type='button' id='add-bp' value='Add'></td>");
         out.println("</tr>");
         out.println("</table>");
-        
-        out.println("</div>");
+
         out.println("</body>");
         html.printHtmlEnd(out);
     }
 
-	private String readAll( BufferedReader rd ) throws IOException {
+    private String readAll( BufferedReader rd ) throws IOException {
         int amt;
         StringBuilder sb = new StringBuilder();
         char[] buf = new char[10240];
@@ -103,16 +97,18 @@ public class MyProjects extends HttpServlet{
         return sb.toString();
     }
 
-	@Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    @Override
+    protected void doPost( 
+        HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException
     {
-		log( request.getRequestURI() );
+        log( request.getRequestURI() );
         util.HTTPUtils.nocache( response );
         PrintWriter out = response.getWriter();
         String user = request.getRemoteUser();
         String context = request.getContextPath();
 
-        if ( pm == null ) {
+        if ( bpm == null ) {
             response.sendRedirect( context + Constants.DB_ERR_PAGE );
             return;
         }
@@ -126,14 +122,15 @@ public class MyProjects extends HttpServlet{
             BufferedReader rd = request.getReader();
             String json = readAll( rd );
             try {
-                Project proj = (Project)gson.fromJson(json, Project.class); 
-                long id = pm.addProject( proj );
-                log("adding: " + user + "=" + proj );
+                BloodPressure bp =
+                    (BloodPressure)gson.fromJson(json, BloodPressure.class); 
+                long id = bpm.add( user, bp );
+                log("adding: " + user + "=" + bp );
                 response.setContentType("application/json");
                 out.print( gson.toJson( id ) ); // return rec number
                 return;
             }
-            catch( PMException ex ) {
+            catch( BPRMException ex ) {
                 log( ex.getMessage() );
                 response.sendRedirect( context + Constants.DB_ERR_PAGE );
                 return;
@@ -143,15 +140,15 @@ public class MyProjects extends HttpServlet{
             BufferedReader rd = request.getReader();
             String json = readAll( rd );
             try {
-            	
-                Project proj = (Project)gson.fromJson(json, Project.class); 
-                pm.updateProject( proj );
-                log("updating: " + user + "=" + proj );
+                BloodPressure bp =
+                    (BloodPressure)gson.fromJson(json, BloodPressure.class); 
+                bpm.update( user, bp );
+                log("updating: " + user + "=" + bp );
                 response.setContentType("application/json");
-                out.print( gson.toJson( proj.getRecordID() ) ); // return rec number
+                out.print( gson.toJson( bp.getRecordID() ) ); // return rec number
                 return;
             }
-            catch( PMException ex ) {
+            catch( BPRMException ex ) {
                 log( ex.getMessage() );
                 response.sendRedirect( context + Constants.DB_ERR_PAGE );
                 return;
@@ -162,7 +159,7 @@ public class MyProjects extends HttpServlet{
             String json = readAll( rd );
             try {
                 long recid = gson.fromJson(json, long.class);
-                pm.deleteProject( recid );
+                bpm.delete( user, recid );
                 log("deleting: " + user + "=" + recid );
                 response.setContentType("application/json");
                 out.print( gson.toJson("ok") ); // ok
@@ -172,7 +169,7 @@ public class MyProjects extends HttpServlet{
                 response.sendRedirect( context + Constants.DATA_ERR_PAGE );
                 return;
             }
-            catch( PMException ex ) {
+            catch( BPRMException ex ) {
                 log( ex.getMessage() );
                 response.sendRedirect( context + Constants.DB_ERR_PAGE );
                 return;
@@ -184,17 +181,21 @@ public class MyProjects extends HttpServlet{
         }
     }
 
-	@Override
+    @Override
     public void init(ServletConfig config) throws ServletException {
         super.init( config ); // super.init call is required
         html = util.HTMLTemplates.newHTMLTemplates( this );
-        
+        dtFormat = new SimpleDateFormat("yy/MM/dd HH:mm");
+        dtFormat.setTimeZone( TimeZone.getDefault() );
+        Date twentyFirstCentury = new GregorianCalendar(2001,1,1).getTime();
+        dtFormat.set2DigitYearStart( twentyFirstCentury );
         try {
-            pm = new SQLitePM( Constants.DB_PATH );
+            bpm = new SQLiteBPM( Constants.DB_PATH );
         }
-        catch( PMException ex ) {
-            pm = null;
+        catch( BPRMException ex ) {
+            bpm = null;
             log( ex.getMessage() );
         }
     }
+    */
 }

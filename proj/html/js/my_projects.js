@@ -168,7 +168,7 @@ function add_entry_init( init_evt ) {
                     console.log( "adding: " + recAdded );
                     var tr = document.createElement("tr");
                     tr.innerHTML = "<td>" +  recAdded + "</td>" +
-                    "<td>"+ rec.name + "</td>" +
+                    "<td><a href='" + "/proj/user/project_edit/" + name_field.value + "'>"+ rec.name + "</a></td>" +
                     "<td>"+ rec.owner + "</td>" +
                     "<td><button class='edit' recno='" + recAdded + "'>Edit</button>" +
                     "<button class='del' recno='" + recAdded + "'>Delete</button></td>";
