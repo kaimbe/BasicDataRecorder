@@ -1,5 +1,6 @@
 package db;
 
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -7,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class SQLitePM implements ProjectManager{
@@ -38,6 +40,9 @@ public class SQLitePM implements ProjectManager{
 	            stmt.executeUpdate(		
 		                "create table if not exists user_projects " +
 		                "(projid integer, user text);");
+	            stmt.executeUpdate(		
+		                "create table if not exists project_properties " +
+		                "(projid integer primary key, description text, users text);");
 	            stmt.close();
 	        }
 	        catch( SQLException ex ) {
@@ -69,7 +74,77 @@ public class SQLitePM implements ProjectManager{
 	            throw new PMException( ex.getMessage() );
 	        }
 	    }
-
+	    
+	    private List<Project> listProjectsFromResultSet( ResultSet rs ) throws SQLException {
+			ArrayList<Project> list = new ArrayList<Project>();
+			while( rs.next() ) {
+				long rowid = rs.getLong("projid");
+			    String name = rs.getString("projname");
+			    String owner = rs.getString("owner");
+			    Project proj = new Project(name, rowid, owner);
+			    list.add( proj );
+			}
+			return list;
+		}
+	    
+	    public boolean doesTableExist(String name) throws PMException{
+			Connection conn = null;
+			boolean res = false;
+			try {
+	            conn = openConnection();
+	            PreparedStatement stmt = conn.prepareStatement("select name from sqlite_master where type=? and name=?");
+	            stmt.setString(1, "table"); 
+	            stmt.setString(2, name);
+	            ResultSet rs = stmt.executeQuery();
+	            String rsName = "";
+	            while( rs.next() ) {
+					rsName = rs.getString("name");
+				}
+	            rs.close();
+	            stmt.close();
+	            
+	            if (name.equals(rsName)) {
+	            	res = true;
+	            }
+	            else {
+	            	res = false;
+	            }
+	        }
+	        catch( SQLException ex ) {
+	            throw new PMException( ex.getMessage() );
+	        }
+	        finally {
+	            closeConnection( conn );
+	        }
+			return res;
+		}
+	    
+	    @Override
+		public long getProjID(String name) throws PMException {
+			Connection conn = null;
+			long id = -1;
+	        try {
+	            conn = openConnection();
+	            PreparedStatement proj = conn.prepareStatement("select projid from projects where projname=?;");
+	            proj.setString(1, name);
+	            ResultSet rs = proj.executeQuery();
+	            
+	            while( rs.next() ) {
+	                id = rs.getLong(1);
+	            }
+	            rs.close();
+	            proj.close();
+	        }
+	        catch( SQLException ex ) {
+	            throw new PMException( ex.getMessage() );
+	        }
+	        finally {
+	            closeConnection( conn );
+	        }
+	       
+			return id;
+		}
+	    
 		@Override
 		public long addProject(Project proj) throws PMException {
 			long rowid = -1;
@@ -141,21 +216,50 @@ public class SQLitePM implements ProjectManager{
 	        }
 	    }
 		
-		public void deleteProject( long rowid ) throws PMException {
+		public void deleteProject( long id ) throws PMException {
 	        Connection conn = null;
 	        try {
+	        	
 	            conn = openConnection();
-	            PreparedStatement stmt = conn.prepareStatement(
+	            String projName = "";
+	            PreparedStatement name = conn.prepareStatement("select projname from projects where projid=?");
+	            name.setLong(1, id);
+	            ResultSet rs = name.executeQuery();
+	            
+	            while( rs.next() ) {
+	                projName = rs.getString(1);
+	            }
+	            rs.close();
+	            name.close();
+	            
+	            PreparedStatement proj = conn.prepareStatement(
 	                "delete from projects where projid=?");
-	            stmt.setLong(1, rowid);
-	            stmt.executeUpdate();
-	            stmt.close();
+	            proj.setLong(1, id);
+	            proj.executeUpdate();
+	            proj.close();
 	            
 	            PreparedStatement usr = conn.prepareStatement(
 		                "delete from user_projects where projid=?");
-	            usr.setLong(1, rowid);
+	            usr.setLong(1, id);
 	            usr.executeUpdate();
 	            usr.close();
+	            
+	            PreparedStatement defn = conn.prepareStatement(
+		                "delete from projs_data_definition where projid=?");
+	            defn.setLong(1, id);
+	            defn.executeUpdate();
+	            defn.close();
+	            
+	            PreparedStatement prop = conn.prepareStatement(
+		                "delete from project_properties where projid=?");
+	            prop.setLong(1, id);
+	            prop.executeUpdate();
+	            prop.close();
+	            
+	            String begin = "drop table if exists ";
+	            PreparedStatement table = conn.prepareStatement(begin + projName);
+	            table.executeUpdate();
+	            table.close();
 	        }
 	        catch( SQLException ex ) {
 	            throw new PMException( ex.getMessage() );
@@ -164,54 +268,42 @@ public class SQLitePM implements ProjectManager{
 	            closeConnection( conn );
 	        }
 		}
-
+		
 		@Override
-		public long addDataDefn(String projectName, DataDefinition defn) throws PMException {
-			long rowid = defn.getIndex();
+		public List<Project> getProjects(String user) throws PMException{
 			Connection conn = null;
-			 
+	        List<Project> list = null;
 	        try {
-	            long projid = getProjID(projectName);
 	            conn = openConnection();
-	            PreparedStatement stmt = conn.prepareStatement("insert into projs_data_definition values(?,?,?,?);");
-	            stmt.setLong(1, projid); 
-	            stmt.setLong(2, rowid); 
-	            stmt.setString(3, defn.getName());
-	            stmt.setString(4, defn.getType());
-	            stmt.executeUpdate();
+	            PreparedStatement stmt = conn.prepareStatement(
+	                "select projects.projid,projects.projname,projects.owner from projects,user_projects where user_projects.user = ? and user_projects.projid = projects.projid");
+	            stmt.setString(1, user); 
+	            ResultSet rs = stmt.executeQuery();
+	            list = listProjectsFromResultSet( rs );
+	            rs.close();
 	            stmt.close();
 	        }
 	        catch( SQLException ex ) {
-	        	if ( conn != null ) {
-	                 try {
-	                     conn.rollback();
-	                 }
-	                 catch( SQLException ex1 ) {
-	                 }
-	             }
-	             throw new PMException( ex.getMessage() );
+	            throw new PMException( ex.getMessage() );
 	        }
 	        finally {
 	            closeConnection( conn );
 	        }
-	        return rowid;
+	        return list;
 		}
-
-		@Override
-		public long getProjID(String name) throws PMException {
+		
+		public List<Project> getOwnerProjects(String owner) throws PMException{
 			Connection conn = null;
-			long id = -1;
+	        List<Project> list = null;
 	        try {
 	            conn = openConnection();
-	            PreparedStatement proj = conn.prepareStatement("select projid from projects where projname=?;");
-	            proj.setString(1, name);
-	            ResultSet rs = proj.executeQuery();
-	            
-	            while( rs.next() ) {
-	                id = rs.getLong(1);
-	            }
+	            PreparedStatement stmt = conn.prepareStatement(
+	                "select * from projects where owner = ?");
+	            stmt.setString(1, owner); 
+	            ResultSet rs = stmt.executeQuery();
+	            list = listProjectsFromResultSet( rs );
 	            rs.close();
-	            proj.close();
+	            stmt.close();
 	        }
 	        catch( SQLException ex ) {
 	            throw new PMException( ex.getMessage() );
@@ -219,10 +311,31 @@ public class SQLitePM implements ProjectManager{
 	        finally {
 	            closeConnection( conn );
 	        }
-	       
-			return id;
+	        return list;
 		}
 
+		@Override
+		public List<Project> getAllProjects() throws PMException {
+			Connection conn = null;
+	        List<Project> list = null;
+	        try {
+	            conn = openConnection();
+	            PreparedStatement stmt = conn.prepareStatement(
+	                "select * from projects");
+	            ResultSet rs = stmt.executeQuery();
+	            list = listProjectsFromResultSet( rs );
+	            rs.close();
+	            stmt.close();
+	        }
+	        catch( SQLException ex ) {
+	            throw new PMException( ex.getMessage() );
+	        }
+	        finally {
+	            closeConnection( conn );
+	        }
+	        return list;
+		}
+		
 		@Override
 		public void createProject(String name) throws PMException {
 			Connection conn = null;
@@ -261,53 +374,53 @@ public class SQLitePM implements ProjectManager{
 	            closeConnection( conn );
 	        }
 		}
-		
-		private List<Project> listFromResultSet( ResultSet rs ) throws SQLException {
-			ArrayList<Project> list = new ArrayList<Project>();
-			while( rs.next() ) {
-				long rowid = rs.getLong("projid");
-			    String name = rs.getString("projname");
-			    String owner = rs.getString("owner");
-			    Project proj = new Project(name, rowid, owner);
-			    list.add( proj );
-			}
-			return list;
-		}
 
 		@Override
-		public List<Project> getProjects(String user) throws PMException{
+		public long addDataDefn(String projectName, DataDefinition defn) throws PMException {
+			long rowid = defn.getIndex();
 			Connection conn = null;
-	        List<Project> list = null;
+			 
 	        try {
+	            long projid = getProjID(projectName);
 	            conn = openConnection();
-	            PreparedStatement stmt = conn.prepareStatement(
-	                "select projects.projid,projects.projname,projects.owner from projects,user_projects where user_projects.user = ? and user_projects.projid = projects.projid");
-	            stmt.setString(1, user); 
-	            ResultSet rs = stmt.executeQuery();
-	            list = listFromResultSet( rs );
-	            rs.close();
+	            PreparedStatement stmt = conn.prepareStatement("insert into projs_data_definition values(?,?,?,?);");
+	            stmt.setLong(1, projid); 
+	            stmt.setLong(2, rowid); 
+	            stmt.setString(3, defn.getName());
+	            stmt.setString(4, defn.getType());
+	            stmt.executeUpdate();
 	            stmt.close();
 	        }
 	        catch( SQLException ex ) {
-	            throw new PMException( ex.getMessage() );
+	        	if ( conn != null ) {
+	                 try {
+	                     conn.rollback();
+	                 }
+	                 catch( SQLException ex1 ) {
+	                 }
+	             }
+	             throw new PMException( ex.getMessage() );
 	        }
 	        finally {
 	            closeConnection( conn );
 	        }
-	        return list;
+	        return rowid;
 		}
 		
-		public List<Project> getOwnerProjects(String owner) throws PMException{
+		public void updateDataDefn(String projName, DataDefinition defn) throws PMException{
 			Connection conn = null;
-	        List<Project> list = null;
 	        try {
+	        	long id = getProjID(projName);
 	            conn = openConnection();
 	            PreparedStatement stmt = conn.prepareStatement(
-	                "select * from projects where owner = ?");
-	            stmt.setString(1, owner); 
-	            ResultSet rs = stmt.executeQuery();
-	            list = listFromResultSet( rs );
-	            rs.close();
+	                "update projs_data_definition set data_field_name=?, " +
+	                "data_field_type=?" +
+	                "where projid=? and data_field_index=?" );
+	            stmt.setString(1, defn.getName());
+	            stmt.setString(2, defn.getType());
+	            stmt.setLong(3, id);
+	            stmt.setLong(4, defn.getIndex());
+	            stmt.executeUpdate();
 	            stmt.close();
 	        }
 	        catch( SQLException ex ) {
@@ -316,19 +429,94 @@ public class SQLitePM implements ProjectManager{
 	        finally {
 	            closeConnection( conn );
 	        }
-	        return list;
 		}
-
-		@Override
-		public List<Project> getAllProjects() throws PMException {
-			Connection conn = null;
-	        List<Project> list = null;
+		
+		public void deleteDataDefn(String projName, long recid) throws PMException {
+	        Connection conn = null;
 	        try {
+	        	long id = getProjID(projName);
 	            conn = openConnection();
 	            PreparedStatement stmt = conn.prepareStatement(
-	                "select * from projects");
+	                "delete from projs_data_definition where projid=? and data_field_index=?");
+	            stmt.setLong(1, id);
+	            stmt.setLong(2, recid);
+	            stmt.executeUpdate();
+	            stmt.close();
+	        }
+	        catch( SQLException ex ) {
+	            throw new PMException( ex.getMessage() );
+	        }
+	        finally {
+	            closeConnection( conn );
+	        }
+		}
+		
+		public void updateProjectSettings(String projectName, ProjectSetting sett) throws PMException{
+			Connection conn = null;
+	        try {
+	        	long id = getProjID(projectName);
+	        	String users = sett.getUsers();
+	        	String[] usrs = users.split("\\s*,\\s*");
+	            conn = openConnection();
+	            PreparedStatement stmt = conn.prepareStatement("insert or replace into project_properties values(?,?,?);");
+	            stmt.setLong(1, id); 
+	            stmt.setString(2, sett.getDescription()); 
+	            stmt.setString(3, users);
+	            stmt.executeUpdate();
+	            stmt.close();
+	            
+	            PreparedStatement own = conn.prepareStatement("select owner from projects where projid=?");
+	            own.setLong(1, id);
+	            ResultSet rs = own.executeQuery();
+	            String owner = "";
+	            
+	            while( rs.next() ) {
+	            	owner = rs.getString(1);
+				}
+	            
+	            rs.close();
+	            own.close();
+	            
+	            PreparedStatement del = conn.prepareStatement("delete from user_projects where projid=? and user!=?");
+	            del.setLong(1, id);
+	            del.setString(2, owner);
+	            del.executeUpdate();
+	            del.close();
+	            
+	            if (! (usrs[0] == null || usrs[0].equals(""))) {
+	            for (int i = 0; i < usrs.length; i++) {
+	            	PreparedStatement usr = conn.prepareStatement("insert or replace into user_projects values(?,?);");
+	            	usr.setLong(1, id);
+	            	usr.setString(2, usrs[i]);
+	            	usr.executeUpdate();
+	            	usr.close();
+	            }
+	            }
+	        }
+	        catch( SQLException ex ) {
+	             throw new PMException( ex.getMessage() );
+	        }
+	        finally {
+	            closeConnection( conn );
+	        }
+		}
+		
+		public ProjectSetting getProjectSetting(String projectName) throws PMException{
+			Connection conn = null;
+	        ProjectSetting setting = new ProjectSetting(null,null);
+	        try {
+	        	long id = getProjID(projectName);
+	            conn = openConnection();
+	            PreparedStatement stmt = conn.prepareStatement("select description,users from project_properties where projid=?");
+	            stmt.setLong(1, id); 
 	            ResultSet rs = stmt.executeQuery();
-	            list = listFromResultSet( rs );
+	            
+	            while( rs.next() ) {
+	            	String desc = rs.getString(1);
+	            	String usrs = rs.getString(2);
+					setting = new ProjectSetting(desc, usrs);
+				}
+	            
 	            rs.close();
 	            stmt.close();
 	        }
@@ -338,6 +526,6 @@ public class SQLitePM implements ProjectManager{
 	        finally {
 	            closeConnection( conn );
 	        }
-	        return list;
+	        return setting;
 		}
 }

@@ -168,14 +168,17 @@ function add_entry_init( init_evt ) {
                     console.log( "adding: " + recAdded );
                     var tr = document.createElement("tr");
                     tr.innerHTML = "<td>" +  recAdded + "</td>" +
-                    "<td><a href='" + "/proj/user/project_edit/" + name_field.value + "'>"+ rec.name + "</a></td>" +
+                    "<td>"+ rec.name + "</td>" +
                     "<td>"+ rec.owner + "</td>" +
                     "<td><button class='edit' recno='" + recAdded + "'>Edit</button>" +
-                    "<button class='del' recno='" + recAdded + "'>Delete</button></td>";
+                    "<button class='del' recno='" + recAdded + "'>Delete</button>" +
+                    "<button class='set' recno='" + recAdded + "'>Setup</button></td>";
                     var nb = tr.querySelector("button.edit");
                     nb.addEventListener('click', edit_item, false);
                     nb = tr.querySelector("button.del");
                     nb.addEventListener('click', delete_item, false);
+                    nb = tr.querySelector("button.set");
+                    nb.addEventListener('click', setup_proj, false);
                     add_tr.parentNode.insertBefore(tr, add_tr);
                     clear_fields();
                 }
@@ -191,10 +194,46 @@ function add_entry_init( init_evt ) {
     }, false );
 }
 
+function setup_proj(evt) {
+	var but = evt.srcElement;
+	var td = but.parentNode;
+	var tr = td.parentNode;
+	var tds = tr.querySelectorAll("td");
+    var name = tds[1].textContent.trim();
+	window.location = "project_setup/" + name;
+}
+
+function setup_button_init() {
+	var buts = document.querySelectorAll("table.editor td button.set");
+    var i;
+    for( i = 0 ; i < buts.length; i++ ) {
+        buts[i].addEventListener('click', setup_proj, false);
+    }
+}
+
+function go_to_properties(evt) {
+	var but = evt.srcElement;
+	var td = but.parentNode;
+	var tr = td.parentNode;
+	var tds = tr.querySelectorAll("td");
+    var name = tds[1].textContent.trim();
+	window.location = "project_properties/" + name;
+}
+
+function go_to_properties_init() {
+	var buts = document.querySelectorAll("table.editor td button.prop");
+    var i;
+    for( i = 0 ; i < buts.length; i++ ) {
+        buts[i].addEventListener('click', go_to_properties, false);
+    }
+}
+
 window.addEventListener( 'load', function(evt) {
         delete_button_init();
         add_entry_init();
         edit_button_init();
+        setup_button_init();
+        go_to_properties_init();
     }, false );
 
 })();

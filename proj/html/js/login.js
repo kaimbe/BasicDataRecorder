@@ -39,26 +39,14 @@
 	        }
 	    } );
 	}
-
-	function new_account( evt ) {
-
-	}
-
+	
 	function login_button_init() {
-
 		var but = document.querySelector("#loginBut");
 	    but.addEventListener('click', login, false);
 	}
 
-	function add_user_button_init() {
-		var but = document.querySelector('#newAccBut');
-	    but.addEventListener('click', new_account, false);
-	}
-
 window.addEventListener( 'load', function(evt) {
-
         login_button_init();
-        add_user_button_init();
     }, false );
 
 })();

@@ -36,12 +36,13 @@ public class ProjectSetup extends HttpServlet{
         util.HTTPUtils.nocache( response );
         String context = request.getContextPath();
         String user = request.getRemoteUser();
+        String pathInfo = request.getPathInfo();
+        String[] pathParts = pathInfo.split("/");
+        String projName = pathParts[1];
+        
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
         html.printHtmlStart(out);
-        
-        // TODO: check to see if project has already been setup
-       
         out.println("<body>");
         out.println("<div class='nav'>");
         
@@ -53,24 +54,36 @@ public class ProjectSetup extends HttpServlet{
         }
         
         out.println("</div>");
-        
+      
         out.println("<div class='usersplash'>");
         out.println("<h1>Project Setup</h1>");
-        out.println("<table class='editor'>");
-        out.println("<tr>");
-        out.println("<td>No</td><td>Data Name</td><td>Data Type</td><td>Command</td>");
-        out.println("</tr>");
         
-        // add data entry form
-        out.println("<tr>");
-        out.println("<td>Edit</td>");
-        out.println("<td><input type='text' id='data-name' size='10'></td>");
-        out.println("<td><select id='data-type'><option>text</option><option>real</option><option>integer</option></select></td>");
-        out.println("<td><input type='button' id='add-entry' value='Add'></td>");
-        out.println("</tr>");
-        out.println("</table>");
-        
-        out.println("<input type='button' id='create-proj' value='Create Project'>");
+        try {
+        if (pm.doesTableExist(projName)) {
+        	out.println("<p>This project has already been set up.<p>");
+        }
+        else {
+        	out.println("<table class='editor'>");
+            out.println("<tr>");
+            out.println("<td>No</td><td>Data Name</td><td>Data Type</td><td>Command</td>");
+            out.println("</tr>");
+            
+            // add data entry form
+            out.println("<tr>");
+            out.println("<td>Edit</td>");
+            out.println("<td><input type='text' id='data-name' size='10'></td>");
+            out.println("<td><select id='data-type'><option>text</option><option>real</option><option>integer</option></select></td>");
+            out.println("<td><input type='button' id='add-entry' value='Add'></td>");
+            out.println("</tr>");
+            out.println("</table><br>");
+            out.println("<input type='button' id='create-proj' value='Create Project'>");
+        }
+        }
+        catch (PMException e) {
+        	log(e.getMessage());
+        	response.sendRedirect( context + Constants.DB_ERR_PAGE );
+            return;
+        }
         
         out.println("</div>");
         out.println("</body>");
@@ -133,11 +146,11 @@ public class ProjectSetup extends HttpServlet{
             String json = readAll( rd );
             try {
             	
-                Project proj = (Project)gson.fromJson(json, Project.class); 
-                pm.updateProject( proj );
-                log("updating: " + user + "=" + proj );
+            	DataDefinition defn = (DataDefinition)gson.fromJson(json, DataDefinition.class); 
+            	pm.updateDataDefn(projName, defn);
+                log("updating: " + user + "=" + defn );
                 response.setContentType("application/json");
-                out.print( gson.toJson( proj.getRecordID() ) ); // return rec number
+                out.print( gson.toJson( defn.getIndex() ) ); // return rec number
                 return;
             }
             catch( PMException ex ) {
@@ -151,7 +164,7 @@ public class ProjectSetup extends HttpServlet{
             String json = readAll( rd );
             try {
                 long recid = gson.fromJson(json, long.class);
-                pm.deleteProject( recid );
+                pm.deleteDataDefn(projName, recid);
                 log("deleting: " + user + "=" + recid );
                 response.setContentType("application/json");
                 out.print( gson.toJson("ok") ); // ok
@@ -171,6 +184,8 @@ public class ProjectSetup extends HttpServlet{
         	
             try {
             	pm.createProject(projName);
+            	response.setContentType("application/json");
+                out.print( gson.toJson(projName) ); 
             	return;
             }
             catch( PMException ex ) {
@@ -178,7 +193,6 @@ public class ProjectSetup extends HttpServlet{
                 response.sendRedirect( context + Constants.DB_ERR_PAGE );
                 return;
             }
-            
         }
         else {
             response.sendRedirect( context + Constants.INVALID_URL_PAGE );

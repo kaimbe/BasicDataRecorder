@@ -23,8 +23,7 @@ import db.PMException;
 public class UserSplash extends HttpServlet{
 	
 	private util.HTMLTemplates html;
-    private Gson gson = new Gson();
-	
+ 
 	@Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
@@ -48,19 +47,9 @@ public class UserSplash extends HttpServlet{
         out.println("</div>");
         out.println("<div class='usersplash'>");
         out.println("<h1> Welcome " + remoteUser + "!</h1>");
-        out.println("<h1>Published Projects:</h1>");
-        out.println("<ul>");
-        out.println("<li>No projects yet");
-        out.println("</ul>");
         out.println("</div>");
         out.println("</body>");
         html.printHtmlEnd(out);
-    }
-	
-	@Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
-    {
-		
     }
 	
 	@Override

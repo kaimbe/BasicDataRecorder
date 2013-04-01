@@ -65,7 +65,6 @@ public class Login extends HttpServlet{
         out.print("Password: <input id='pw' type='password' size='20'>");
         out.println("</label><br>");
         out.println("<button id='loginBut'>Login</button><br>");
-        out.println("<button id='newAccBut'>Create New Account</button><br>");
         out.println("</div>");
         
         out.println("</body>");

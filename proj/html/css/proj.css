@@ -51,17 +51,17 @@ div#adminnav{
 
 div.nav{
 	position:absolute;
-	right:1320px;
+	left:25%;
 	width:13%;
 	border: solid black thin;
 }
 
 div.usersplash{
 	position:absolute;
-	right:670px;
+	left:45%;
 }
 
 div.adminsplash{
 	position:absolute;
-	right:670px;
+	left:45%;
 }

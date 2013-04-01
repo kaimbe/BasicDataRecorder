@@ -142,7 +142,29 @@
     	<url-pattern>/user/project_setup/*</url-pattern>
     </servlet-mapping>
     
+    <servlet>
+    	<description>Project Properties</description>
+    	<display-name>ProjectProperties</display-name>
+    	<servlet-name>ProjectProperties</servlet-name>
+    	<servlet-class>servlets.ProjectProperties</servlet-class>
+    	<init-param>
+    		<param-name>css</param-name>
+    		<param-value>proj.css</param-value>
+    	</init-param>
+    	<init-param>
+    		<param-name>js</param-name>
+    		<param-value>local_ajax.js,project_properties.js</param-value>
+    	</init-param>
+    	<init-param>
+    		<param-name>title</param-name>
+    		<param-value>Project Properties</param-value>
+    	</init-param>
+    </servlet>
     
+    <servlet-mapping>
+    	<servlet-name>ProjectProperties</servlet-name>
+    	<url-pattern>/user/project_properties/*</url-pattern>
+    </servlet-mapping>
     
     
     

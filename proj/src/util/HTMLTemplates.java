@@ -75,7 +75,7 @@ public class HTMLTemplates {
     
     public void printUserNav( PrintWriter pw ) {
     	pw.println("<div id='navbar'>");
-    	pw.println("<h1>User Navigation</h1>");
+    	pw.println("<h2>User Navigation</h2>");
     	pw.println("</div>");
     	pw.println("<div id='usernav'>");
     	pw.println("<ul class='navlist'>");
@@ -107,7 +107,7 @@ public class HTMLTemplates {
     public void printAdminNav( PrintWriter pw ) {
     	printUserNav(pw);
     	pw.println("<div id='adminbar'>");
-    	pw.println("<h1>Admin Navigation</h1>");
+    	pw.println("<h2>Admin Navigation</h2>");
     	pw.println("</div>");
     	pw.println("<div id='adminnav'>");
     	pw.println("<ul class='adminlist'>");

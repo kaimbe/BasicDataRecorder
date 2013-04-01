@@ -63,14 +63,19 @@ public class MyProjects extends HttpServlet{
             for( Project proj : list ) {
                 out.println("<tr>");
                 out.printf("<td>%d</td>%n", proj.getRecordID() );
-                out.printf("<td><a href='" + context + Constants.PROJECT_SETUP + "/" + proj.getName() + "'>" + "%s</a></td>%n", proj.getName());
+                out.printf("<td>%s</td>%n", proj.getName());
                 out.printf("<td>%s</td>%n", proj.getOwner());
                
                 String ed = String.format("<button class='edit' recno='%d'>Edit</button>",
                     proj.getRecordID() );
                 String del = String.format("<button class='del' recno='%d'>Delete</button>",
                     proj.getRecordID() );
-                out.print( "<td>" + ed + del + "</td>" );
+                String set = String.format("<button class='set' recno='%d'>Setup</button>",
+                	proj.getRecordID() );
+                String prop = String.format("<button class='prop' recno='%d'>Properties</button>",
+                    	proj.getRecordID() );
+                		
+                out.print( "<td>" + ed + del + set + prop + "</td>" );
                 out.println("</tr>");
             }
         }
