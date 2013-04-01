@@ -90,7 +90,7 @@ public class HTMLTemplates {
     	
     	pw.print("<li><a href='");
     	pw.print(contextPath + "/user");
-    	pw.println("/power_search'>Power Search</a></li>");
+    	pw.println("/contribute'>Contribute to a project</a></li>");
     	
     	pw.print("<li><a href='");
     	pw.print(contextPath + "/user");

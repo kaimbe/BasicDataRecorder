@@ -34,7 +34,7 @@ public class SQLitePM implements ProjectManager{
 	                "(projid integer primary key, projname text unique, owner text);"); 
 	            stmt.executeUpdate(		
 	                "create table if not exists projs_data_definition " +
-	                "(projid integer, data_field_index integer, data_field_name text, data_field_type text);");
+	                "(projid integer, data_field_index integer, data_field_name text, data_field_type text, primary key (projid, data_field_index));");
 	            stmt.executeUpdate(		
 		                "create table if not exists user_projects " +
 		                "(projid integer, user text);");
@@ -166,32 +166,41 @@ public class SQLitePM implements ProjectManager{
 		}
 
 		@Override
-		public void addEntryDefn(String projectName, int dataFieldIndex, String dataFieldName, String dataFieldType) throws PMException {
+		public long addDataDefn(String projectName, DataDefinition defn) throws PMException {
+			long rowid = defn.getIndex();
 			Connection conn = null;
 			 
 	        try {
-	            int id = getProjID(projectName);
+	            long projid = getProjID(projectName);
 	            conn = openConnection();
-	            PreparedStatement defn = conn.prepareStatement("insert into projs_data_definition values(?,?,?,?);");
-	            defn.setInt(1, id); 
-	            defn.setInt(2, dataFieldIndex); 
-	            defn.setString(3, dataFieldName);
-	            defn.setString(4, dataFieldType);
-	            defn.executeUpdate();
-	            defn.close();
+	            PreparedStatement stmt = conn.prepareStatement("insert into projs_data_definition values(?,?,?,?);");
+	            stmt.setLong(1, projid); 
+	            stmt.setLong(2, rowid); 
+	            stmt.setString(3, defn.getName());
+	            stmt.setString(4, defn.getType());
+	            stmt.executeUpdate();
+	            stmt.close();
 	        }
 	        catch( SQLException ex ) {
-	            throw new PMException( ex.getMessage() );
+	        	if ( conn != null ) {
+	                 try {
+	                     conn.rollback();
+	                 }
+	                 catch( SQLException ex1 ) {
+	                 }
+	             }
+	             throw new PMException( ex.getMessage() );
 	        }
 	        finally {
 	            closeConnection( conn );
 	        }
+	        return rowid;
 		}
 
 		@Override
-		public int getProjID(String name) throws PMException {
+		public long getProjID(String name) throws PMException {
 			Connection conn = null;
-			int id = 0;
+			long id = -1;
 	        try {
 	            conn = openConnection();
 	            PreparedStatement proj = conn.prepareStatement("select projid from projects where projname=?;");
@@ -199,7 +208,7 @@ public class SQLitePM implements ProjectManager{
 	            ResultSet rs = proj.executeQuery();
 	            
 	            while( rs.next() ) {
-	                id = rs.getInt(1);
+	                id = rs.getLong(1);
 	            }
 	            rs.close();
 	            proj.close();
@@ -219,13 +228,13 @@ public class SQLitePM implements ProjectManager{
 			Connection conn = null;
 			 
 	        try {
-	            int id = getProjID(name);
+	            long id = getProjID(name);
 	            conn = openConnection();
-	            PreparedStatement stmt = conn.prepareStatement("select data_field_name,data_field_type from projs_data_definition where id=?");
-	            stmt.setInt(1, id); 
+	            PreparedStatement stmt = conn.prepareStatement("select data_field_name,data_field_type from projs_data_definition where projid=?");
+	            stmt.setLong(1, id); 
 	            ResultSet rs = stmt.executeQuery();
 	            
-	            String tableStart = "create table if not exists ? (rowid integer primary key,";
+	            String tableStart = "create table if not exists " + name + " (rowid integer primary key,";
 	            String cols = "";
 	            
 	            while( rs.next() ) {
@@ -237,16 +246,17 @@ public class SQLitePM implements ProjectManager{
 	            
 	            rs.close();
 	            stmt.close();
-	            
 	            cols = cols.substring(0, cols.length() - 1);
-	            PreparedStatement table = conn.prepareStatement(tableStart + cols + ");");
-	            table.setString(1, name);
+	            String tableCreate = tableStart + cols + ");";
+	            PreparedStatement table = conn.prepareStatement(tableCreate);
 	            table.executeUpdate();
 	            table.close();
 	        }
+	        
 	        catch( SQLException ex ) {
 	            throw new PMException( ex.getMessage() );
 	        }
+	        
 	        finally {
 	            closeConnection( conn );
 	        }

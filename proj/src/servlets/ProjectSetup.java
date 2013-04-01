@@ -3,8 +3,11 @@ package servlets;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -14,18 +17,17 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
 
-import db.BPRMException;
-import db.BloodPressure;
+import db.DataDefinition;
 import db.PMException;
 import db.Project;
-import db.SQLiteBPM;
 import db.SQLitePM;
-import db.User;
 
-public class MyProjects extends HttpServlet{
+public class ProjectSetup extends HttpServlet{
 	private util.HTMLTemplates html;
     private Gson gson = new Gson();
     private SQLitePM pm;
+    
+    private SimpleDateFormat dtFormat;
 
 	@Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
@@ -37,6 +39,9 @@ public class MyProjects extends HttpServlet{
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
         html.printHtmlStart(out);
+        
+        // TODO: check to see if project has already been setup
+       
         out.println("<body>");
         out.println("<div class='nav'>");
         
@@ -50,43 +55,22 @@ public class MyProjects extends HttpServlet{
         out.println("</div>");
         
         out.println("<div class='usersplash'>");
-        out.println("<h1>My Projects</h1>");
+        out.println("<h1>Project Setup</h1>");
         out.println("<table class='editor'>");
         out.println("<tr>");
-        out.print("<td>No</td><td>Project Name</td>");
-        out.println("<td>Project Owner</td>");
-        out.println("<td>Command</td>");
+        out.println("<td>No</td><td>Data Name</td><td>Data Type</td><td>Command</td>");
         out.println("</tr>");
         
-        try {
-            List<Project> list = pm.getOwnerProjects( user );
-            for( Project proj : list ) {
-                out.println("<tr>");
-                out.printf("<td>%d</td>%n", proj.getRecordID() );
-                out.printf("<td><a href='" + context + Constants.PROJECT_SETUP + "/" + proj.getName() + "'>" + "%s</a></td>%n", proj.getName());
-                out.printf("<td>%s</td>%n", proj.getOwner());
-               
-                String ed = String.format("<button class='edit' recno='%d'>Edit</button>",
-                    proj.getRecordID() );
-                String del = String.format("<button class='del' recno='%d'>Delete</button>",
-                    proj.getRecordID() );
-                out.print( "<td>" + ed + del + "</td>" );
-                out.println("</tr>");
-            }
-        }
-        catch( PMException ex ) {
-            log( ex.getMessage() );
-            out.println("<tr><td>Data base error</td></tr>");
-        }
-        
-        // the add a project form
+        // add data entry form
         out.println("<tr>");
         out.println("<td>Edit</td>");
-        out.println("<td><input type='text' id='proj-name' size='10'></td>");
-        out.println("<td><input type='text' id='proj-owner' size='10'></td>");
-        out.println("<td><input type='button' id='add-proj' value='Add'></td>");
+        out.println("<td><input type='text' id='data-name' size='10'></td>");
+        out.println("<td><select id='data-type'><option>text</option><option>real</option><option>integer</option></select></td>");
+        out.println("<td><input type='button' id='add-entry' value='Add'></td>");
         out.println("</tr>");
         out.println("</table>");
+        
+        out.println("<input type='button' id='create-proj' value='Create Project'>");
         
         out.println("</div>");
         out.println("</body>");
@@ -111,7 +95,7 @@ public class MyProjects extends HttpServlet{
         PrintWriter out = response.getWriter();
         String user = request.getRemoteUser();
         String context = request.getContextPath();
-
+        
         if ( pm == null ) {
             response.sendRedirect( context + Constants.DB_ERR_PAGE );
             return;
@@ -120,15 +104,20 @@ public class MyProjects extends HttpServlet{
             response.sendError( HttpServletResponse.SC_FORBIDDEN, "No premission");
             return;
         }
-
+        
         String pathInfo = request.getPathInfo();
-        if ( pathInfo != null && pathInfo.startsWith("/add") ) {
+        String[] pathParts = pathInfo.split("/");
+        String projName = pathParts[1];
+        String cmd = "/" + pathParts[2];
+        
+        if ( pathInfo != null && cmd.startsWith("/add") ) {
             BufferedReader rd = request.getReader();
             String json = readAll( rd );
             try {
-                Project proj = (Project)gson.fromJson(json, Project.class); 
-                long id = pm.addProject( proj );
-                log("adding: " + user + "=" + proj );
+                DataDefinition defn = (DataDefinition)gson.fromJson(json, DataDefinition.class); 
+                long id = pm.addDataDefn(projName, defn );
+                
+                log("adding: " + user + "=" + defn );
                 response.setContentType("application/json");
                 out.print( gson.toJson( id ) ); // return rec number
                 return;
@@ -139,7 +128,7 @@ public class MyProjects extends HttpServlet{
                 return;
             }
         }
-        else if ( pathInfo != null && pathInfo.startsWith("/update") ) {
+        else if ( pathInfo != null && cmd.startsWith("/update") ) {
             BufferedReader rd = request.getReader();
             String json = readAll( rd );
             try {
@@ -157,7 +146,7 @@ public class MyProjects extends HttpServlet{
                 return;
             }
         }
-        else if ( pathInfo != null && pathInfo.startsWith("/delete") ){
+        else if ( pathInfo != null && cmd.startsWith("/delete") ){
             BufferedReader rd = request.getReader();
             String json = readAll( rd );
             try {
@@ -178,6 +167,19 @@ public class MyProjects extends HttpServlet{
                 return;
             }
         }
+        else if ( pathInfo != null && cmd.startsWith("/create") ) {
+        	
+            try {
+            	pm.createProject(projName);
+            	return;
+            }
+            catch( PMException ex ) {
+                log( ex.getMessage() );
+                response.sendRedirect( context + Constants.DB_ERR_PAGE );
+                return;
+            }
+            
+        }
         else {
             response.sendRedirect( context + Constants.INVALID_URL_PAGE );
             return;
@@ -188,6 +190,10 @@ public class MyProjects extends HttpServlet{
     public void init(ServletConfig config) throws ServletException {
         super.init( config ); // super.init call is required
         html = util.HTMLTemplates.newHTMLTemplates( this );
+        dtFormat = new SimpleDateFormat("yy/MM/dd HH:mm");
+        dtFormat.setTimeZone( TimeZone.getDefault() );
+        Date twentyFirstCentury = new GregorianCalendar(2001,1,1).getTime();
+        dtFormat.set2DigitYearStart( twentyFirstCentury );
         
         try {
             pm = new SQLitePM( Constants.DB_PATH );
@@ -198,3 +204,4 @@ public class MyProjects extends HttpServlet{
         }
     }
 }
+
