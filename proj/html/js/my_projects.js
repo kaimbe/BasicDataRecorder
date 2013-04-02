@@ -217,7 +217,7 @@ function go_to_properties(evt) {
 	var tr = td.parentNode;
 	var tds = tr.querySelectorAll("td");
     var name = tds[1].textContent.trim();
-	window.location = "project_properties/" + name;
+	window.location = "edit_project_properties/" + name;
 }
 
 function go_to_properties_init() {

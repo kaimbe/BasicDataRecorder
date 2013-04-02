@@ -209,7 +209,7 @@ function create_proj_init(init_evt) {
                 try {
                     var recAdded = JSON.parse( req.responseText );
                     console.log( "creating: " + recAdded );
-                    window.location = "/proj/user/project_properties/" + recAdded;
+                    window.location = "/proj/user/edit_project_properties/" + recAdded;
                 }
                 catch( e ) {
                     console.log( e );

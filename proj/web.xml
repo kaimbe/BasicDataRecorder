@@ -71,30 +71,50 @@
     </servlet-mapping>
     
     <servlet>
-    	<description>Contribute to a project</description>
-    	<display-name>Contribute</display-name>
-    	<servlet-name>Contribute</servlet-name>
-    	<servlet-class>servlets.Contribute</servlet-class>
+    	<description>Projects</description>
+    	<display-name>Projects</display-name>
+    	<servlet-name>Projects</servlet-name>
+    	<servlet-class>servlets.Projects</servlet-class>
     	<init-param>
     		<param-name>css</param-name>
     		<param-value>proj.css</param-value>
     	</init-param>
     	<init-param>
     		<param-name>title</param-name>
-    		<param-value>Contribute</param-value>
+    		<param-value>Projects</param-value>
     	</init-param>
     </servlet>
     
     <servlet-mapping>
-    	<servlet-name>Contribute</servlet-name>
-    	<url-pattern>/user/contribute</url-pattern>
+    	<servlet-name>Projects</servlet-name>
+    	<url-pattern>/user/projects</url-pattern>
     </servlet-mapping>
     
     <servlet>
-    	<description>Project Edit</description>
-    	<display-name>ProjectEdit</display-name>
-    	<servlet-name>ProjectEdit</servlet-name>
-    	<servlet-class>servlets.ProjectEdit</servlet-class>
+    	<description>Project Description</description>
+    	<display-name>ProjectDescription</display-name>
+    	<servlet-name>ProjectDescription</servlet-name>
+    	<servlet-class>servlets.ProjectDescription</servlet-class>
+    	<init-param>
+    		<param-name>css</param-name>
+    		<param-value>proj.css</param-value>
+    	</init-param>
+    	<init-param>
+    		<param-name>title</param-name>
+    		<param-value>Project Description</param-value>
+    	</init-param>
+    </servlet>
+    
+    <servlet-mapping>
+    	<servlet-name>ProjectDescription</servlet-name>
+    	<url-pattern>/user/project_description/*</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+    	<description>Edit Project</description>
+    	<display-name>EditProject</display-name>
+    	<servlet-name>EditProject</servlet-name>
+    	<servlet-class>servlets.EditProject</servlet-class>
     	<init-param>
     		<param-name>css</param-name>
     		<param-value>proj.css</param-value>
@@ -105,13 +125,13 @@
     	</init-param>
     	<init-param>
     		<param-name>title</param-name>
-    		<param-value>Project Edit</param-value>
+    		<param-value>Edit Project</param-value>
     	</init-param>
     </servlet>
     
     <servlet-mapping>
-    	<servlet-name>ProjectEdit</servlet-name>
-    	<url-pattern>/user/project_edit/*</url-pattern>
+    	<servlet-name>EditProject</servlet-name>
+    	<url-pattern>/user/edit_project/*</url-pattern>
     </servlet-mapping>
     
     <servlet>
@@ -139,10 +159,10 @@
     </servlet-mapping>
     
     <servlet>
-    	<description>Project Properties</description>
-    	<display-name>ProjectProperties</display-name>
-    	<servlet-name>ProjectProperties</servlet-name>
-    	<servlet-class>servlets.ProjectProperties</servlet-class>
+    	<description>Edit Project Properties</description>
+    	<display-name>EditProjectProperties</display-name>
+    	<servlet-name>EditProjectProperties</servlet-name>
+    	<servlet-class>servlets.EditProjectProperties</servlet-class>
     	<init-param>
     		<param-name>css</param-name>
     		<param-value>proj.css</param-value>
@@ -153,13 +173,13 @@
     	</init-param>
     	<init-param>
     		<param-name>title</param-name>
-    		<param-value>Project Properties</param-value>
+    		<param-value>Edit Project Properties</param-value>
     	</init-param>
     </servlet>
     
     <servlet-mapping>
-    	<servlet-name>ProjectProperties</servlet-name>
-    	<url-pattern>/user/project_properties/*</url-pattern>
+    	<servlet-name>EditProjectProperties</servlet-name>
+    	<url-pattern>/user/edit_project_properties/*</url-pattern>
     </servlet-mapping>
     
     

@@ -23,7 +23,7 @@ import db.Project;
 import db.ProjectSetting;
 import db.SQLitePM;
 
-public class ProjectProperties extends HttpServlet {
+public class EditProjectProperties extends HttpServlet {
 	private util.HTMLTemplates html;
     private Gson gson = new Gson();
     private SQLitePM pm;
@@ -72,7 +72,7 @@ public class ProjectProperties extends HttpServlet {
         }
         catch (PMException ex) {
         	log( ex.getMessage() );
-            out.println("<tr><td>Data base error</td></tr>");
+            out.println("<p>Data base error</p>");
         }
         
         out.println("<input type='button' id='update_properties' value='Update Properties'>");

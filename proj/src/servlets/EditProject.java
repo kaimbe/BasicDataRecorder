@@ -18,7 +18,7 @@ import db.Project;
 import db.SQLitePM;
 
 
-public class ProjectEdit extends HttpServlet{
+public class EditProject extends HttpServlet{
 	private util.HTMLTemplates html;
     private Gson gson = new Gson();
     private SQLitePM pm;
