@@ -528,4 +528,183 @@ public class SQLitePM implements ProjectManager{
 	        }
 	        return setting;
 		}
+		
+		public List<String> getRecordHeads(String projName) throws PMException{
+			Connection conn = null;
+	        ArrayList<String> list = new ArrayList<String>();
+	        try {
+	            conn = openConnection();
+	            PreparedStatement stmt = conn.prepareStatement("pragma table_info(" + projName + ")");
+	            ResultSet rs = stmt.executeQuery();
+	            
+	            while (rs.next()) {
+	            	list.add(rs.getString("name"));
+	            }
+	            
+	            rs.close();
+	            stmt.close();
+	        }
+	        catch( SQLException ex ) {
+	            throw new PMException( ex.getMessage() );
+	        }
+	        finally {
+	            closeConnection( conn );
+	        }
+	        return list;
+		}
+		
+		public long numOfCols(String projName) throws PMException{
+			Connection conn = null;
+			long colCount = 0;
+			try {
+				conn = openConnection();
+			PreparedStatement cols = conn.prepareStatement("pragma table_info(" + projName + ")");
+            ResultSet rs = cols.executeQuery();
+            
+            while (rs.next()) {
+            	colCount++;
+            }
+            rs.close();
+            cols.close();
+			}
+			catch( SQLException ex ) {
+	            throw new PMException( ex.getMessage() );
+	        }
+	        finally {
+	            closeConnection( conn );
+	        }
+			return colCount;
+		}
+		
+		public List<List<String>> getRecords(String projName) throws PMException{
+			Connection conn = null;
+	        List<List<String>> list = new ArrayList<List<String>>();
+	        try {
+	            conn = openConnection();
+	            long colCount = numOfCols(projName);
+	            PreparedStatement stmt = conn.prepareStatement("select * from " + projName); 
+	            ResultSet rs = stmt.executeQuery();
+	            
+	            while (rs.next()) {
+	            	List<String> recs = new ArrayList<String>();
+	            	for (int i = 1; i < (colCount + 1); i++) {
+	            		String value = rs.getString(i);
+	            		recs.add(value);
+	            	}
+	            	list.add(recs);
+	            }
+	            
+	            rs.close();
+	            stmt.close();
+	        }
+	        catch( SQLException ex ) {
+	            throw new PMException( ex.getMessage() );
+	        }
+	        finally {
+	            closeConnection( conn );
+	        }
+	        return list;
+		}
+		
+		public long addRecord(String projName, String[] values) throws PMException{
+			long rowid = -1;
+			Connection conn = null;
+	        try {
+	            conn = openConnection();
+	            conn.setAutoCommit(false);
+	            String addStart = "insert into " + projName + " values(null,";
+	            long colNum = values.length;
+	            String addMid = "";
+	            
+	            for (int i = 0; i < colNum; i++) {
+	            	addMid += "'" + values[i] + "',";
+	            }
+	            
+	            addMid = addMid.substring(0, addMid.length() - 1);
+	            String addRow = addStart + addMid + ");";
+	            PreparedStatement stmt = conn.prepareStatement(addRow);
+	            stmt.executeUpdate();
+	            stmt.close();
+	            		
+	            PreparedStatement maxid = conn.prepareStatement("select last_insert_rowid() from " + projName);
+	          
+	            ResultSet rs = maxid.executeQuery();
+	            conn.commit();
+	            if ( rs.next() ) {
+	                 rowid = rs.getLong(1);
+	            }
+	            else {
+	                throw new PMException("last row rowid missing");
+	            }
+	            
+	            rs.close();
+	            maxid.close();
+	            conn.setAutoCommit( true );
+	        }
+	        catch( SQLException ex ) {
+	        	 if ( conn != null ) {
+	                 try {
+	                     conn.rollback();
+	                 }
+	                 catch( SQLException ex1 ) {
+	                 }
+	             }
+	             throw new PMException( ex.getMessage() );
+	        }
+	        finally {
+	            closeConnection( conn );
+	        }
+	        return rowid;
+		}
+		
+		
+		public void updateRecord(String projName, String[] values) throws PMException {
+			Connection conn = null;
+	        try {
+	            conn = openConnection();
+	            String addStart = "update " + projName + " set ";
+	            String addEnd = " where rowid='" + values[0] + "'";
+	            
+	            List<String> heads = getRecordHeads(projName);     
+	            
+	            long colNum = values.length;
+	            String addMid = "";
+	            
+	            for (int i = 1; i < colNum; i++) {
+	            	addMid += heads.get(i) + "='" + values[i] + "',";
+	            }
+	            
+	            addMid = addMid.substring(0, addMid.length() - 1);
+	            
+	            String addRow = addStart + addMid + addEnd;
+	            PreparedStatement stmt = conn.prepareStatement(addRow);
+	            
+	            stmt.executeUpdate();
+	            stmt.close();
+	        }
+	        catch( SQLException ex ) {
+	            throw new PMException( ex.getMessage() );
+	        }
+	        finally {
+	            closeConnection( conn );
+	        }
+		}
+		
+		public void deleteRecord(String projName, long recid) throws PMException{
+			Connection conn = null;
+	        try {
+	            conn = openConnection();
+	            PreparedStatement stmt = conn.prepareStatement("delete from " + projName + " where rowid=?");
+	            stmt.setLong(1, recid);
+	            stmt.executeUpdate();
+	            stmt.close();
+	        }
+	        catch( SQLException ex ) {
+	            throw new PMException( ex.getMessage() );
+	        }
+	        finally {
+	            closeConnection( conn );
+	        }
+		}
+		
 }

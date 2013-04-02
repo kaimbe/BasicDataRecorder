@@ -105,7 +105,7 @@
     	</init-param>
     	<init-param>
     		<param-name>js</param-name>
-    		<param-value>local_ajax.js</param-value>
+    		<param-value>local_ajax.js,project_edit.js</param-value>
     	</init-param>
     	<init-param>
     		<param-name>title</param-name>

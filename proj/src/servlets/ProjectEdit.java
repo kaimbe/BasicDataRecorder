@@ -3,11 +3,7 @@ package servlets;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.TimeZone;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -17,77 +13,116 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
 
+import db.PMException;
+import db.Project;
+import db.SQLitePM;
+
 
 public class ProjectEdit extends HttpServlet{
-	/*
 	private util.HTMLTemplates html;
-    private ProjectManager pm;
     private Gson gson = new Gson();
+    private SQLitePM pm;
 
-    private SimpleDateFormat dtFormat;
-
-    @Override
-    protected void doGet(
-        HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException
+	@Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
         log( request.getRequestURI() );
         util.HTTPUtils.nocache( response );
         String context = request.getContextPath();
-
         String user = request.getRemoteUser();
-        if ( pm == null ) {
-            response.sendRedirect( context + Constants.DB_ERR_PAGE );
-            return;
-        }
+        String pathInfo = request.getPathInfo();
+        String[] pathParts = pathInfo.split("/");
+        String projName = pathParts[1];
+        
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
         html.printHtmlStart(out);
         out.println("<body>");
-        out.printf("<h1>Blood Pressure Editor: %s</h1>%n", user);
-        out.println("<table class='editor'>");
+        out.println("<div class='nav'>");
+        
+        if (request.isUserInRole("admin")) {
+        	html.printAdminNav(out);
+        }
+        else if (request.isUserInRole("user")) {
+        	html.printUserNav(out);
+        }
+        
+        List<String> heads = null;
+        long colNum = 0;
+        
+        try{
+            heads = pm.getRecordHeads(projName);
+            colNum= pm.numOfCols(projName) - 1;
+            }
+            catch (PMException ex) {
+            	log(ex.getMessage());
+            }
+        
+        out.println("</div>");
+        
+        out.println("<div class='usersplash'>");
+        out.println("<h1>Edit Project</h1>");
+        out.println("<table class='editor' colnum='" + colNum + "'>");
+        
         out.println("<tr>");
-        out.print("<td>No</td><td>YY/MM/DD HH:MM</td><td>Systolic</td>");
-        out.println("<td>Diastolic</td><td>Pulse</td><td>Command</td>");
+        
+       //create cols based on table
+        for (String s : heads) {
+        	out.println("<td>" + s + "</td>");
+        }
+        out.println("<td>Command</td>");
         out.println("</tr>");
+        
+        
         try {
-            List<BloodPressure> list = bpm.getRecords( user );
-            for( BloodPressure rec : list ) {
+            List<List<String>> recs = pm.getRecords( projName );
+            for( List<String> rows : recs ) { // for every row
                 out.println("<tr>");
-                out.printf("<td>%d</td>%n", rec.getRecordID() );
-                Date d = new Date( rec.getTimeStamp() );
-                out.printf("<td>%s</td>%n", dtFormat.format( d ));
-                out.printf("<td>%6.1f</td>%n", rec.getSystolic());
-                out.printf("<td>%6.1f</td>%n", rec.getDiastolic());
-                out.printf("<td>%6.1f</td>%n", rec.getPulseRate());
-                String ed = String.format("<button class='edit' recno='%d'>Edit</button>",
-                    rec.getRecordID() );
-                String del = String.format("<button class='del' recno='%d'>Delete</button>",
-                    rec.getRecordID() );
+                String recno = rows.get(0);
+                // for every col
+                for (Object entry : rows) {
+                	out.printf("<td>%s</td>%n", entry );
+                }
+                //end col
+              
+                String ed = String.format("<button class='edit' recno='%s'>Edit</button>",
+                    recno );
+                String del = String.format("<button class='del' recno='%s'>Delete</button>",
+                    recno );
+                
                 out.print( "<td>" + ed + del + "</td>" );
+                
                 out.println("</tr>");
             }
         }
-        catch( BPRMException ex ) {
+        catch( PMException ex ) {
             log( ex.getMessage() );
             out.println("<tr><td>Data base error</td></tr>");
         }
-        // the add a reading form
+        
+        // the add a record form
         out.println("<tr>");
         out.println("<td>Edit</td>");
-        out.println("<td><input type='text' id='date' size='12'></td>");
-        out.println("<td><input type='text' id='systolic' size='5'></td>");
-        out.println("<td><input type='text' id='diastolic' size='5'></td>");
-        out.println("<td><input type='text' id='pulse' size='5'></td>");
-        out.println("<td><input type='button' id='add-bp' value='Add'></td>");
+        
+        	// for every col
+            for (int i = 1; i < (colNum + 1); i++) {
+            	String row = String.format("<input type='text' class='add' id='%s%d' size='10'>", "add-", i);
+            	out.println("<td>" + row + "</td>");
+            }
+            //end col
+        
+        
+        out.println("<td><input type='button' id='add-proj' value='Add'></td>");
         out.println("</tr>");
+        
         out.println("</table>");
-
+        
+        out.println("</div>");
         out.println("</body>");
         html.printHtmlEnd(out);
     }
 
-    private String readAll( BufferedReader rd ) throws IOException {
+	private String readAll( BufferedReader rd ) throws IOException {
         int amt;
         StringBuilder sb = new StringBuilder();
         char[] buf = new char[10240];
@@ -97,18 +132,16 @@ public class ProjectEdit extends HttpServlet{
         return sb.toString();
     }
 
-    @Override
-    protected void doPost( 
-        HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException
+	@Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
-        log( request.getRequestURI() );
+		log( request.getRequestURI() );
         util.HTTPUtils.nocache( response );
         PrintWriter out = response.getWriter();
         String user = request.getRemoteUser();
         String context = request.getContextPath();
 
-        if ( bpm == null ) {
+        if ( pm == null ) {
             response.sendRedirect( context + Constants.DB_ERR_PAGE );
             return;
         }
@@ -116,50 +149,55 @@ public class ProjectEdit extends HttpServlet{
             response.sendError( HttpServletResponse.SC_FORBIDDEN, "No premission");
             return;
         }
-
+        
+        
         String pathInfo = request.getPathInfo();
-        if ( pathInfo != null && pathInfo.startsWith("/add") ) {
+        String[] pathParts = pathInfo.split("/");
+        String projName = pathParts[1];
+        String cmd = "/" + pathParts[2];
+        
+        if ( pathInfo != null && cmd.startsWith("/add") ) {
             BufferedReader rd = request.getReader();
             String json = readAll( rd );
             try {
-                BloodPressure bp =
-                    (BloodPressure)gson.fromJson(json, BloodPressure.class); 
-                long id = bpm.add( user, bp );
-                log("adding: " + user + "=" + bp );
+                String[] vals = (String[])gson.fromJson(json, String[].class); 
+                long id = pm.addRecord( projName, vals );
+                log("adding: " + user + "=" + vals );
                 response.setContentType("application/json");
                 out.print( gson.toJson( id ) ); // return rec number
                 return;
             }
-            catch( BPRMException ex ) {
+            catch( PMException ex ) {
                 log( ex.getMessage() );
                 response.sendRedirect( context + Constants.DB_ERR_PAGE );
                 return;
             }
         }
-        else if ( pathInfo != null && pathInfo.startsWith("/update") ) {
+        
+        else if ( pathInfo != null && cmd.startsWith("/update") ) {
             BufferedReader rd = request.getReader();
             String json = readAll( rd );
             try {
-                BloodPressure bp =
-                    (BloodPressure)gson.fromJson(json, BloodPressure.class); 
-                bpm.update( user, bp );
-                log("updating: " + user + "=" + bp );
+            	String[] vals = (String[])gson.fromJson(json, String[].class);  
+            	pm.updateRecord( projName, vals );
+                log("updating: " + user + "=" + vals );
                 response.setContentType("application/json");
-                out.print( gson.toJson( bp.getRecordID() ) ); // return rec number
+                out.print( gson.toJson( vals[0] ) ); // return rec number
                 return;
             }
-            catch( BPRMException ex ) {
+            catch( PMException ex ) {
                 log( ex.getMessage() );
                 response.sendRedirect( context + Constants.DB_ERR_PAGE );
                 return;
             }
         }
-        else if ( pathInfo != null && pathInfo.startsWith("/delete") ){
+        
+        else if ( pathInfo != null && cmd.startsWith("/delete") ){
             BufferedReader rd = request.getReader();
             String json = readAll( rd );
             try {
                 long recid = gson.fromJson(json, long.class);
-                bpm.delete( user, recid );
+                pm.deleteRecord( projName, recid );
                 log("deleting: " + user + "=" + recid );
                 response.setContentType("application/json");
                 out.print( gson.toJson("ok") ); // ok
@@ -169,7 +207,7 @@ public class ProjectEdit extends HttpServlet{
                 response.sendRedirect( context + Constants.DATA_ERR_PAGE );
                 return;
             }
-            catch( BPRMException ex ) {
+            catch( PMException ex ) {
                 log( ex.getMessage() );
                 response.sendRedirect( context + Constants.DB_ERR_PAGE );
                 return;
@@ -181,21 +219,17 @@ public class ProjectEdit extends HttpServlet{
         }
     }
 
-    @Override
+	@Override
     public void init(ServletConfig config) throws ServletException {
         super.init( config ); // super.init call is required
         html = util.HTMLTemplates.newHTMLTemplates( this );
-        dtFormat = new SimpleDateFormat("yy/MM/dd HH:mm");
-        dtFormat.setTimeZone( TimeZone.getDefault() );
-        Date twentyFirstCentury = new GregorianCalendar(2001,1,1).getTime();
-        dtFormat.set2DigitYearStart( twentyFirstCentury );
+        
         try {
-            bpm = new SQLiteBPM( Constants.DB_PATH );
+            pm = new SQLitePM( Constants.DB_PATH );
         }
-        catch( BPRMException ex ) {
-            bpm = null;
+        catch( PMException ex ) {
+            pm = null;
             log( ex.getMessage() );
         }
     }
-    */
 }
