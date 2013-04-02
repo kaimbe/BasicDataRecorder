@@ -12,10 +12,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+
 import com.google.gson.Gson;
 
-import db.BPRMException;
-import db.BloodPressure;
 import db.PMException;
 import db.Project;
 import db.SQLitePM;
