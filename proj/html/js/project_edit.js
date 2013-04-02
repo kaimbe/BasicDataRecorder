@@ -53,7 +53,7 @@ function make_editable( tr ) {
     var colNum = table.getAttribute("colnum");
     // for each col
     var i;
-    for (i = 1; i <= colNum ; i++) {
+    for (i = 2; i <= colNum ; i++) {
     	var name = tds[i].textContent.trim();
     	tds[i].innerHTML = "<input type='text' size='10' value='" + name + "'>";
     	tds[i].setAttribute("field", name );
@@ -108,7 +108,7 @@ function edit_item( evt )  {
     rec[0] = recno;
     // for each col
     var i;
-    for (i = 1; i <= colNum; i++) {
+    for (i = 1; i < colNum; i++) {
     	rec[i] = inputs[i-1].value;
     }
     

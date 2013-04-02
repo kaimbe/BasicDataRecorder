@@ -1,5 +1,5 @@
 body {
-    background: rgb(255,255,240);
+    background: rgb(230,255,210);
     width : 90%;
     margin-left : auto;
     margin-right : auto;
@@ -15,7 +15,7 @@ table.editor td {
 }
 
 div#user-list h2 {
-    color : blue;
+    color : green;
 }
 
 div#user-list table tr td:first-child {
@@ -29,39 +29,31 @@ div#user-list table tr td:first-child + td + td {
 }
 
 div#user-list table tr:first-child td {
-    border-bottom : solid blue thin;
+    border-bottom : solid green thin;
 }
 
 div#navbar {
-    border-bottom: solid black thin;
-}
-
-div#usernav {
-	
+    border-bottom: solid green thin;
+    text-align: center;
 }
 
 div#adminbar{
-    border-bottom: solid black thin;
-    border-top: solid black thin;
-}
-
-div#adminnav{
-	
+    border-bottom: solid green thin;
+    border-top: solid green thin;
+    text-align: center;
 }
 
 div.nav{
 	position:absolute;
-	left:25%;
+	left:20%;
 	width:13%;
-	border: solid black thin;
+	border: solid green thin;
+	background: rgb(210,255,175);
+	margin-left: auto;
+	margin-right: auto;
 }
 
 div.usersplash{
 	position:absolute;
-	left:45%;
-}
-
-div.adminsplash{
-	position:absolute;
-	left:45%;
+	left:38%;
 }

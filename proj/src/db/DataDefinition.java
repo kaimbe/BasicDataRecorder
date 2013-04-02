@@ -4,7 +4,7 @@ public class DataDefinition {
 	private long index;
 	private String name;
 	private String type;
-	
+
 	/**
 	 * @param index
 	 * @param name
@@ -25,7 +25,8 @@ public class DataDefinition {
 	}
 
 	/**
-	 * @param index the index to set
+	 * @param index
+	 *            the index to set
 	 */
 	public void setIndex(long index) {
 		this.index = index;
@@ -39,7 +40,8 @@ public class DataDefinition {
 	}
 
 	/**
-	 * @param name the name to set
+	 * @param name
+	 *            the name to set
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -53,14 +55,14 @@ public class DataDefinition {
 	}
 
 	/**
-	 * @param type the type to set
+	 * @param type
+	 *            the type to set
 	 */
 	public void setType(String type) {
 		this.type = type;
 	}
 
 	public String toString() {
-        return String.format("%d %s %s",
-            index, name, type);
-    }
+		return String.format("%d %s %s", index, name, type);
+	}
 }

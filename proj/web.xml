@@ -186,7 +186,29 @@
     	<url-pattern>/user/edit_project_properties/*</url-pattern>
     </servlet-mapping>
     
+    <servlet>
+    	<description>Reports</description>
+    	<display-name>Reports</display-name>
+    	<servlet-name>Reports</servlet-name>
+    	<servlet-class>servlets.Reports</servlet-class>
+    	<init-param>
+    		<param-name>css</param-name>
+    		<param-value>proj.css</param-value>
+    	</init-param>
+    	<init-param>
+    		<param-name>js</param-name>
+    		<param-value>local_ajax.js,reports.js</param-value>
+    	</init-param>
+    	<init-param>
+    		<param-name>title</param-name>
+    		<param-value>Reports</param-value>
+    	</init-param>
+    </servlet>
     
+    <servlet-mapping>
+    	<servlet-name>Reports</servlet-name>
+    	<url-pattern>/user/reports/*</url-pattern>
+    </servlet-mapping>
     
     
     
