@@ -33,6 +33,7 @@ public class EditProject extends HttpServlet{
         String pathInfo = request.getPathInfo();
         String[] pathParts = pathInfo.split("/");
         String projName = pathParts[1];
+        long projid = Long.parseLong(projName);
         
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
@@ -49,10 +50,12 @@ public class EditProject extends HttpServlet{
         
         List<String> heads = null;
         long colNum = 0;
+        String rProjName = "";
         
         try{
-            heads = pm.getRecordHeads(projName);
-            colNum= pm.numOfCols(projName) - 1;
+            heads = pm.getRecordHeads(projid);
+            colNum= pm.numOfCols(projid) - 1;
+            rProjName = pm.getProjectName(projid);
             }
             catch (PMException ex) {
             	log(ex.getMessage());
@@ -62,6 +65,7 @@ public class EditProject extends HttpServlet{
         
         out.println("<div class='usersplash'>");
         out.println("<h1>Edit Project</h1>");
+        out.println("<h2>Project Name: " + rProjName + "</h2>");
         out.println("<table class='editor' colnum='" + colNum + "'>");
         
         out.println("<tr>");
@@ -75,7 +79,7 @@ public class EditProject extends HttpServlet{
         
         
         try {
-            List<List<String>> recs = pm.getRecords( projName );
+            List<List<String>> recs = pm.getUserRecords(projid, user);
             for( List<String> rows : recs ) { // for every row
                 out.println("<tr>");
                 String recno = rows.get(0);
@@ -103,9 +107,10 @@ public class EditProject extends HttpServlet{
         // the add a record form
         out.println("<tr>");
         out.println("<td>Edit</td>");
+        out.println("<td><p class='add' id='add-1'>" + user + "</p></td>");
         
         	// for every col
-            for (int i = 1; i < (colNum + 1); i++) {
+            for (int i = 2; i <= colNum; i++) {
             	String row = String.format("<input type='text' class='add' id='%s%d' size='10'>", "add-", i);
             	out.println("<td>" + row + "</td>");
             }
@@ -155,16 +160,18 @@ public class EditProject extends HttpServlet{
         String[] pathParts = pathInfo.split("/");
         String projName = pathParts[1];
         String cmd = "/" + pathParts[2];
+        long projid = Long.parseLong(projName);
         
         if ( pathInfo != null && cmd.startsWith("/add") ) {
             BufferedReader rd = request.getReader();
             String json = readAll( rd );
             try {
                 String[] vals = (String[])gson.fromJson(json, String[].class); 
-                long id = pm.addRecord( projName, vals );
+                long id = pm.addRecord( projid, user, vals );
                 log("adding: " + user + "=" + vals );
                 response.setContentType("application/json");
-                out.print( gson.toJson( id ) ); // return rec number
+                Object[] ret = {id, user};
+                out.print( gson.toJson(ret) ); // return rec number
                 return;
             }
             catch( PMException ex ) {
@@ -179,7 +186,7 @@ public class EditProject extends HttpServlet{
             String json = readAll( rd );
             try {
             	String[] vals = (String[])gson.fromJson(json, String[].class);  
-            	pm.updateRecord( projName, vals );
+            	pm.updateRecord( projid, vals );
                 log("updating: " + user + "=" + vals );
                 response.setContentType("application/json");
                 out.print( gson.toJson( vals[0] ) ); // return rec number
@@ -197,7 +204,7 @@ public class EditProject extends HttpServlet{
             String json = readAll( rd );
             try {
                 long recid = gson.fromJson(json, long.class);
-                pm.deleteRecord( projName, recid );
+                pm.deleteRecord( projid, recid );
                 log("deleting: " + user + "=" + recid );
                 response.setContentType("application/json");
                 out.print( gson.toJson("ok") ); // ok

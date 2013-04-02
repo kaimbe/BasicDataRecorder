@@ -1,5 +1,6 @@
 package servlets;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
@@ -10,6 +11,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.gson.Gson;
+
 import db.PMException;
 import db.Project;
 import db.ProjectSetting;
@@ -18,6 +21,7 @@ import db.SQLitePM;
 public class ProjectDescription extends HttpServlet {
 	private util.HTMLTemplates html;
     private SQLitePM pm;
+    private Gson gson = new Gson();
 
 	@Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
@@ -29,6 +33,7 @@ public class ProjectDescription extends HttpServlet {
         String pathInfo = request.getPathInfo();
         String[] pathParts = pathInfo.split("/");
         String projName = pathParts[1];
+        long projid = Long.parseLong(projName);
         
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
@@ -44,11 +49,11 @@ public class ProjectDescription extends HttpServlet {
         }
         
         List<String> heads = null;
-        long colNum = 0;
+        String rProjName = "";
         
         try{
-            heads = pm.getRecordHeads(projName);
-            
+            heads = pm.getRecordHeads(projid);
+            rProjName = pm.getProjectName(projid);
             }
             catch (PMException ex) {
             	log(ex.getMessage());
@@ -58,6 +63,7 @@ public class ProjectDescription extends HttpServlet {
         
         out.println("<div class='usersplash'>");
         out.println("<h1>Project Description</h1>");
+        out.println("<h2>Project Name: " + rProjName + "</h2>");
         out.println("<table class='editor'>");
         
         out.println("<tr>");
@@ -70,7 +76,7 @@ public class ProjectDescription extends HttpServlet {
         out.println("</tr>");
         
         try {
-            List<List<String>> recs = pm.getRecords( projName );
+            List<List<String>> recs = pm.getAllRecords( projid );
             for( List<String> rows : recs ) { // for every row
                 out.println("<tr>");
                 String recno = rows.get(0);
@@ -91,7 +97,7 @@ public class ProjectDescription extends HttpServlet {
         out.println("</table><br>");
         
         try {
-        	ProjectSetting setting = pm.getProjectSetting(projName);
+        	ProjectSetting setting = pm.getProjectSetting(projid);
             out.println("<label>Project Description: <br><p>" + setting.getDescription() + "</p></label><br>");
             out.println("<label>Project Users: <br><p>" + setting.getUsers() + "</p></label><br>");
             
@@ -101,11 +107,47 @@ public class ProjectDescription extends HttpServlet {
             out.println("<p>Data base error</p>");
         }
         
-        // TODO: put contribute button here
+        out.println("<input type='button' id='edit_project' value='Edit Project'>");
         
         out.println("</div>");
         out.println("</body>");
         html.printHtmlEnd(out);
+    }
+	
+	@Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    {
+		log( request.getRequestURI() );
+        util.HTTPUtils.nocache( response );
+        PrintWriter out = response.getWriter();
+        String user = request.getRemoteUser();
+        String context = request.getContextPath();
+        
+        if ( pm == null ) {
+            response.sendRedirect( context + Constants.DB_ERR_PAGE );
+            return;
+        }
+        if ( ! request.isUserInRole("user") ) {
+            response.sendError( HttpServletResponse.SC_FORBIDDEN, "No premission");
+            return;
+        }
+        
+        String pathInfo = request.getPathInfo();
+        String[] pathParts = pathInfo.split("/");
+        String projName = pathParts[1];
+        String cmd = "/" + pathParts[2];
+        
+        
+        if ( pathInfo != null && cmd.startsWith("/edit") ) {
+            log("redir: " + user + "=" + projName );
+			response.setContentType("application/json");
+			out.print( gson.toJson(projName) );
+			return;
+        }
+        else {
+            response.sendRedirect( context + Constants.INVALID_URL_PAGE );
+            return;
+        }
     }
 
 	@Override

@@ -40,6 +40,7 @@ public class EditProjectProperties extends HttpServlet {
         String pathInfo = request.getPathInfo();
         String[] pathParts = pathInfo.split("/");
         String projName = pathParts[1];
+        long projid = Long.parseLong(projName);
         
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
@@ -60,7 +61,7 @@ public class EditProjectProperties extends HttpServlet {
         out.println("<div class='usersplash'>");
         out.println("<h1>Project Properties</h1>");
         try {
-        	ProjectSetting setting = pm.getProjectSetting(projName);
+        	ProjectSetting setting = pm.getProjectSetting(projid);
         	if (((setting.getUsers() == null) || (setting.getUsers().equals(""))) && ((setting.getDescription() == null) || (setting.getDescription().equals("")))) {
         		out.println("<label>Project Description: <br><textarea id='des' rows='5' cols='30'>Enter a description of the project...</textarea></label><br>");
             	out.println("<label>Project Users: <br><textarea id='usrs' rows='5' cols='30'>Enter the users that are allowed to contribute towards this project...</textarea></label><br>");
@@ -114,13 +115,14 @@ public class EditProjectProperties extends HttpServlet {
         String[] pathParts = pathInfo.split("/");
         String projName = pathParts[1];
         String cmd = "/" + pathParts[2];
+        long projid = Long.parseLong(projName);
         
         if ( pathInfo != null && cmd.startsWith("/update") ) {
             BufferedReader rd = request.getReader();
             String json = readAll( rd );
             try {
                 ProjectSetting sett = (ProjectSetting)gson.fromJson(json, ProjectSetting.class); 
-                pm.updateProjectSettings(projName, sett);
+                pm.updateProjectSettings(projid, sett);
                 log("updating: " + user + "=" + sett );
                 response.setContentType("application/json");
                 out.print( gson.toJson("ok") ); // ok

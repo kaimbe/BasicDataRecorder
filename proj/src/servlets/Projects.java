@@ -56,7 +56,7 @@ public class Projects extends HttpServlet{
             for( Project proj : list ) {
                 out.println("<tr>");
                 out.printf("<td>%d</td>%n", proj.getRecordID() );
-                out.printf("<td><a href='" + context + Constants.PROJECT_DESC + "/" + proj.getName() + "'>" + "%s</a></td>%n", proj.getName());
+                out.printf("<td><a href='" + context + Constants.PROJECT_DESC + "/" + proj.getRecordID() + "'>" + "%s</a></td>%n", proj.getName());
                 out.printf("<td>%s</td>%n", proj.getOwner());
                 out.println("</tr>");
             }

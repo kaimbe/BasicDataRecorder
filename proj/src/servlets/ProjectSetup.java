@@ -26,9 +26,7 @@ public class ProjectSetup extends HttpServlet{
 	private util.HTMLTemplates html;
     private Gson gson = new Gson();
     private SQLitePM pm;
-    
-    private SimpleDateFormat dtFormat;
-
+   
 	@Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
@@ -39,6 +37,7 @@ public class ProjectSetup extends HttpServlet{
         String pathInfo = request.getPathInfo();
         String[] pathParts = pathInfo.split("/");
         String projName = pathParts[1];
+        long projid = Long.parseLong(projName);
         
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
@@ -59,10 +58,11 @@ public class ProjectSetup extends HttpServlet{
         out.println("<h1>Project Setup</h1>");
         
         try {
-        if (pm.doesTableExist(projName)) {
+        if (pm.doesTableExist("p_" + projName)) {
         	out.println("<p>This project has already been set up.<p>");
         }
         else {
+        	pm.deleteAllDataDefn(projid);
         	out.println("<table class='editor'>");
             out.println("<tr>");
             out.println("<td>No</td><td>Data Name</td><td>Data Type</td><td>Command</td>");
@@ -122,13 +122,14 @@ public class ProjectSetup extends HttpServlet{
         String[] pathParts = pathInfo.split("/");
         String projName = pathParts[1];
         String cmd = "/" + pathParts[2];
+        long projid = Long.parseLong(projName);
         
         if ( pathInfo != null && cmd.startsWith("/add") ) {
             BufferedReader rd = request.getReader();
             String json = readAll( rd );
             try {
                 DataDefinition defn = (DataDefinition)gson.fromJson(json, DataDefinition.class); 
-                long id = pm.addDataDefn(projName, defn );
+                long id = pm.addDataDefn(projid, defn );
                 
                 log("adding: " + user + "=" + defn );
                 response.setContentType("application/json");
@@ -147,7 +148,7 @@ public class ProjectSetup extends HttpServlet{
             try {
             	
             	DataDefinition defn = (DataDefinition)gson.fromJson(json, DataDefinition.class); 
-            	pm.updateDataDefn(projName, defn);
+            	pm.updateDataDefn(projid, defn);
                 log("updating: " + user + "=" + defn );
                 response.setContentType("application/json");
                 out.print( gson.toJson( defn.getIndex() ) ); // return rec number
@@ -164,7 +165,7 @@ public class ProjectSetup extends HttpServlet{
             String json = readAll( rd );
             try {
                 long recid = gson.fromJson(json, long.class);
-                pm.deleteDataDefn(projName, recid);
+                pm.deleteDataDefn(projid, recid);
                 log("deleting: " + user + "=" + recid );
                 response.setContentType("application/json");
                 out.print( gson.toJson("ok") ); // ok
@@ -183,7 +184,7 @@ public class ProjectSetup extends HttpServlet{
         else if ( pathInfo != null && cmd.startsWith("/create") ) {
         	
             try {
-            	pm.createProject(projName);
+            	pm.createProject(projid);
             	response.setContentType("application/json");
                 out.print( gson.toJson(projName) ); 
             	return;
@@ -204,11 +205,7 @@ public class ProjectSetup extends HttpServlet{
     public void init(ServletConfig config) throws ServletException {
         super.init( config ); // super.init call is required
         html = util.HTMLTemplates.newHTMLTemplates( this );
-        dtFormat = new SimpleDateFormat("yy/MM/dd HH:mm");
-        dtFormat.setTimeZone( TimeZone.getDefault() );
-        Date twentyFirstCentury = new GregorianCalendar(2001,1,1).getTime();
-        dtFormat.set2DigitYearStart( twentyFirstCentury );
-        
+
         try {
             pm = new SQLitePM( Constants.DB_PATH );
         }

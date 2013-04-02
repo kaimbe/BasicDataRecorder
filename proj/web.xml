@@ -100,6 +100,10 @@
     		<param-value>proj.css</param-value>
     	</init-param>
     	<init-param>
+    		<param-name>js</param-name>
+    		<param-value>local_ajax.js,project_description.js</param-value>
+    	</init-param>
+    	<init-param>
     		<param-name>title</param-name>
     		<param-value>Project Description</param-value>
     	</init-param>

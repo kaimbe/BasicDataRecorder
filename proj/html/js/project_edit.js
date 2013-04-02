@@ -166,7 +166,7 @@ function add_entry_init( init_evt ) {
     	var rec = new Array();
     	// for each col
     	var i;
-        for (i = 0; i < colNum; i++) {
+        for (i = 0; i < (colNum - 1); i++) {
         	rec[i] = fields[i].value;
         }
         
@@ -182,11 +182,11 @@ function add_entry_init( init_evt ) {
                     var recAdded = JSON.parse( req.responseText );
                     console.log( "adding: " + recAdded );
                     var tr = document.createElement("tr");
-                    var new_row_start = "<td>" +  recAdded + "</td>";
+                    var new_row_start = "<td>" +  recAdded[0] + "</td><td>" + recAdded[1] + "</td>";
                     var new_row_mid = "";
                     // for each col
                     var i;
-                    for (i = 0; i < colNum; i++) {
+                    for (i = 0; i < (colNum - 1); i++) {
                     	new_row_mid += "<td>" + rec[i] + "</td>";
                     }
                     

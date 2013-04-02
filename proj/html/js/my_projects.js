@@ -196,11 +196,8 @@ function add_entry_init( init_evt ) {
 
 function setup_proj(evt) {
 	var but = evt.srcElement;
-	var td = but.parentNode;
-	var tr = td.parentNode;
-	var tds = tr.querySelectorAll("td");
-    var name = tds[1].textContent.trim();
-	window.location = "project_setup/" + name;
+	var recno = parseInt( but.getAttribute("recno"));
+	window.location = "project_setup/" + recno;
 }
 
 function setup_button_init() {
@@ -213,11 +210,8 @@ function setup_button_init() {
 
 function go_to_properties(evt) {
 	var but = evt.srcElement;
-	var td = but.parentNode;
-	var tr = td.parentNode;
-	var tds = tr.querySelectorAll("td");
-    var name = tds[1].textContent.trim();
-	window.location = "edit_project_properties/" + name;
+	var recno = parseInt( but.getAttribute("recno"));
+	window.location = "edit_project_properties/" + recno;
 }
 
 function go_to_properties_init() {
