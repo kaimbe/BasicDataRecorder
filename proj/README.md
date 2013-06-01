@@ -1,1 +1,1 @@
-proj
+This directory contains all of the Java source code, database files, and static web content to be used by the application. "db_config" is used by the app to establish connections to the databases. "web.xml" is a configuration file for the app, used by the server. The "html" directory contains all of the static web content. The "src" directory contains all of the Java source code (mainly servlet classes).   

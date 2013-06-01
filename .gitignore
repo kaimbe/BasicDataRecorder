@@ -1,6 +1,5 @@
 bin/
-bp-war/
-demo-war/
+src/
 proj-war/
 .settings/
 .project
