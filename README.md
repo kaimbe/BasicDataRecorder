@@ -3,7 +3,6 @@ BasicDataRecorder
 
 CS 3715 Term Project
 
-Author: Matthew Newell
 
 This repository represents the submission that I made for my CS 3715 (Network Computing with Web Applications) term project. (Winter 2012 Semester) 
 The overall aim of the project was to create a web application that can be used to keep track of school projects. 
@@ -28,4 +27,16 @@ To run the server and configure it to serve the “proj” web app:
 3)	Upon successful completion of the previous step, run the command “ant jetty”. This will compile the source code, configure the server to run the “proj” web app and start the jetty server.
 
 
-If there were no errors, the server should now be running. To test out the web app, open a web browser and go to the address “localhost:8000/proj”. The system requires credentials for all users.  To login, go to the login page and use the credentials: (username: “matt”, password: “matt”). Using these credentials will log you in to the system as an administrator. 
+If there were no errors, the server should now be running. To test out the web app, open a web browser and go to the address “localhost:8000/proj”. The system requires credentials for all users.  To login, go to the login page and use the credentials: (username: “matt”, password: “matt”). Using these credentials will log you in to the system as an administrator.
+
+
+Author
+======
+
+Matthew Newell
+
+
+License
+======
+
+This project is released under the [MIT license](http://opensource.org/licenses/MIT) 
